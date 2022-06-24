@@ -23,7 +23,8 @@ import com.sun.jndi.ldap.LdapName;
 public class JndiLdapImpl {
 
 	private static final String BASE_PATH = "ou=employees,dc=inflinx,dc=com";
-	
+
+	// Connecting to LDAP
 	private DirContext getContext() throws NamingException {
 		Properties environment = new Properties();
 		// 指定服务提供者类
@@ -35,55 +36,49 @@ public class JndiLdapImpl {
 		environment.setProperty(DirContext.SECURITY_PRINCIPAL, "uid=admin,ou=system");
 		environment.setProperty(DirContext.SECURITY_PRINCIPAL, "cn=Directory Manager");
 		environment.setProperty(DirContext.SECURITY_CREDENTIALS, "opendj");
-
 		DirContext context = new InitialDirContext(environment);
-		
 		return context;
 	}
-	
+
+	// Closing Resources
 	private void closeContext(DirContext context) {
 		try {
-			if(null != context) {
+			if (null != context) {
 				context.close();
 			}
-		}
-		catch(NamingException e) {
+		} catch (NamingException e) {
 			// Ignore the exception
 		}
 	}
-	
+
 	public void search() {
 		DirContext context = null;
 		NamingEnumeration<SearchResult> searchResults = null;
-		try{
+		try {
 			context = getContext();
-			// Setup Search meta data
+			// 设置搜索元数据
 			SearchControls searchControls = new SearchControls();
 			searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			searchControls.setReturningAttributes(new String[]{"givenName", "telephoneNumber"});
+			searchControls.setReturningAttributes(new String[] { "givenName", "telephoneNumber" });
+			// 三个参数：确定搜索起点的基数、缩小结果范围的过滤器和搜索控件。
 			searchResults = context.search("dc=inflinx,dc=com",
 					"(objectClass=inetOrgPerson)", searchControls);
-			
 			while (searchResults.hasMore()) {
 				SearchResult result = searchResults.next();
 				Attributes attributes = result.getAttributes();
-				String firstName = (String)attributes.get("givenName").get(); 
-				
+				String firstName = (String) attributes.get("givenName").get();
 				// Read the multi-valued attribute
 				Attribute phoneAttribute = attributes.get("telephoneNumber");
 				String[] phone = new String[phoneAttribute.size()];
 				NamingEnumeration phoneValues = phoneAttribute.getAll();
-				
-				for(int i = 0; phoneValues.hasMore(); i++) {
-					phone[i] = (String)phoneValues.next();
+				for (int i = 0; phoneValues.hasMore(); i++) {
+					phone[i] = (String) phoneValues.next();
 				}
-				System.out.println(firstName +  "> " + Arrays.toString(phone)); 
+				System.out.println(firstName + "> " + Arrays.toString(phone));
 			}
-		}
-		catch(NamingException e) {
+		} catch (NamingException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
 				if (null != searchResults) {
 					searchResults.close();
@@ -94,17 +89,30 @@ public class JndiLdapImpl {
 			}
 		}
 	}
-	
-	
-	
+
+	// 测试lookup
+	private void lookup() {
+		DirContext context = null;
+		Object lookupResults = null;
+		try {
+			context = getContext();
+			lookupResults = context.lookup("uid=emp1,ou=employees, dc=inflinx,dc=com");
+			System.out.println(lookupResults);
+		} catch (NamingException e) {
+			e.printStackTrace();
+		} finally {
+			closeContext(context);
+		}
+	}
+
+	// Creating a New Entry
 	public void addEmploye(Employee employee) {
-		
 		DirContext context = null;
 		try {
 			context = getContext();
-			
-			// Populate the attributes
+			// BasicAttributes 来抽象一个属性集合
 			Attributes attributes = new BasicAttributes();
+			// 创建一组需要添加到条目的属性
 			attributes.put(new BasicAttribute("objectClass", "inetOrgPerson"));
 			attributes.put(new BasicAttribute("uid", employee.getUid()));
 			attributes.put(new BasicAttribute("givenName", employee.getFirstName()));
@@ -113,58 +121,51 @@ public class JndiLdapImpl {
 			attributes.put(new BasicAttribute("departmentNumber", employee.getDepartmentNumber()));
 			attributes.put(new BasicAttribute("mail", employee.getEmail()));
 			attributes.put(new BasicAttribute("employeeNumber", employee.getEmployeeNumber()));
-			
 			Attribute phoneAttribute = new BasicAttribute("telephoneNumber");
-			for(String phone : employee.getPhone()) {
+			for (String phone : employee.getPhone()) {
 				phoneAttribute.add(phone);
 			}
 			attributes.put(phoneAttribute);
-			
-			// Get the fully qualified DN
+			// 获取fully qualified DN（完全限定 DN）
 			String dn = "uid=" + employee.getUid() + "," + BASE_PATH;
-			
-			// Add the entry
-			context.createSubcontext("dn", attributes);
-		}
-		catch(NamingException e) {
+			// 添加条目 entry
+			context.createSubcontext(dn, attributes);
+		} catch (NamingException e) {
 			// Handle the exception properly
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			closeContext(context);
 		}
 	}
-	
+
+	// 更新条目的
 	public void update(String dn, ModificationItem[] items) {
 		DirContext context = null;
 		try {
 			context = getContext();
 			context.modifyAttributes(dn, items);
-		}
-		catch (NamingException e) {
+		} catch (NamingException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			closeContext(context);
 		}
 	}
-	
-	
+
+	// 删除条目
 	public void remove(String dn) {
 		DirContext context = null;
 		try {
 			context = getContext();
 			context.destroySubcontext(dn);
-		}
-		catch(NamingException e) {
+		} catch (NamingException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			closeContext(context);
 		}
 	}
-	
-	
+
+	// 删除子树
+	// 许多 LDAP 服务器不允许删除具有子条目的条目。 在这些服务器中，删除非叶条目将需要遍历子树并删除所有子条目，然后才可删除非叶子条目。
 	public void removeSubTree(DirContext ctx, String root) throws NamingException {
 		NamingEnumeration enumeration = null;
 		try {
@@ -173,29 +174,24 @@ public class JndiLdapImpl {
 				Binding childEntry = (Binding) enumeration.next();
 				LdapName childName = new LdapName(root);
 				childName.add(childEntry.getName());
-				
 				try {
 					ctx.destroySubcontext(childName);
-				}
-				catch (ContextNotEmptyException e) {
+				} catch (ContextNotEmptyException e) {
 					removeSubTree(ctx, childName.toString());
 					ctx.destroySubcontext(childName);
 				}
 			}
-		}
-		catch (NamingException e) {
+		} catch (NamingException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
 				enumeration.close();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		JndiLdapImpl jli = new JndiLdapImpl();
 		jli.search();
