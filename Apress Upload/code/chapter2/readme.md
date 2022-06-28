@@ -48,7 +48,7 @@ javax.naming 包中的 Context 接口和 InitialContext 类可用于创建初始
 - 添加新的属性和值，或向现有的多值属性添加新值。
 - 替换现有属性值。
 - 删除属性及其值。
-- 
+
 为了允许修改条目，JNDI 提供了一个恰当命名的 javax。 命名.directory.ModificationItem 类。
 ModificationItem 由要进行的修改类型和正在修改的属性组成。
 
@@ -77,9 +77,12 @@ ModificationItem modificationItem = new ModificationItem(DirContext. ADD_ATTRIBU
 
 尽管 JNDI 为访问目录服务提供了很好的抽象，但它确实存在以下几个缺点：
 
-- 显式资源管理
+- 显式资源管理 Explicit Resource Management
   开发者负责关闭所有资源。 这很容易出错，并可能导致内存泄漏。
-- 管道规范
+  The developer is responsible for closing all the resources. This is very error prone and can result in memory leaks.
+- 管道规范 Plumbing Code
   我们在上面看到的方法有很多可以轻松抽象和重用的管道代码。 这种管道代码使测试变得更加困难，开发人员必须了解 API 的本质。
+  The methods we have seen above have lot of plumbing code that can be easily abstracted and reused. This plumbing code makes testing harder and the developer has to learn the nitty-gritty of the API.
 - 检查异常
   检查异常的使用，特别是在不可恢复的情况下是值得怀疑的。 在这些情况下必须显式处理 NamingException 通常会导致空的 try catch 块。
+  The usage for checked exceptions especially in irrecoverable situations is questionable. Having to explicitly handle NamingException in those scenario usually results in empty try catch blocks.

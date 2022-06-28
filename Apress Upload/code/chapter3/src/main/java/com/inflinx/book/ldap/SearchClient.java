@@ -16,40 +16,37 @@ public class SearchClient {
 	@SuppressWarnings("unchecked")
 	public List<String> search() {
 		LdapTemplate ldapTemplate = getLdapTemplate();
-		
-		List<String> nameList = ldapTemplate.search("dc=inflinx,dc=com", "(objectclass=person)", 
+		return ldapTemplate.search("dc=inflinx,dc=com", "(objectclass=person)",
 				new AttributesMapper() {
 					@Override
 					public Object mapFromAttributes(Attributes attributes) throws NamingException {
-						return (String)attributes.get("cn").get();
-					} });		
-		return nameList;
+						return attributes.get("cn").get();
+					}
+				});
 	}
-	
-	private LdapTemplate getLdapTemplate() { 
-		
+
+	private LdapTemplate getLdapTemplate() {
+		// 配置和创建 LDAP 服务器上的初始上下文实例
 		LdapContextSource contextSource = new LdapContextSource();
 		contextSource.setUrl("ldap://localhost:11389");
 		contextSource.setUserDn("cn=Directory Manager");
 		contextSource.setPassword("opendj");
 		try {
 			contextSource.afterPropertiesSet();
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		// 创建 LdapTemplate 类的实例
 		LdapTemplate ldapTemplate = new LdapTemplate();
 		ldapTemplate.setContextSource(contextSource);
-		
-		return ldapTemplate; 
+		return ldapTemplate;
 	}
 
 	public static void main(String[] args) {
 		SearchClient client = new SearchClient();
 		List<String> names = client.search();
-		
-		for(String name: names) {
+
+		for (String name : names) {
 			System.out.println(name);
 		}
 	}
