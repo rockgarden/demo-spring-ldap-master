@@ -141,4 +141,30 @@ SimpleLdapTemplate 仅公开 LdapTemplate 中可用操作的子集。但是，�
 我们对搜索客户端实现的转换见 applicationContext.xml 文件。
 
 在上下文文件中，您声明一个 contextSource bean 来管理与 LDAP 服务器的连接。 为了让 LdapContextSource 正确创建 DirContext 的实例，您需要向它提供有关 LDAP 服务器的信息。 url 属性将完全限定的 URL（ldap://server:port 格式）带到 LDAP 服务器。 base 属性可用于指定所有 LDAP 操作的根后缀。 userDn 和 password 属性用于提供身份验证信息。 接下来，您配置一个新的 LdapTemplate bean 并注入 contextSource bean。
-在上下文文件中声明了所有依赖项后，您可以继续重新实现搜索客户端，如SpringSearchClient.java。
+在上下文文件中声明了所有依赖项后，可以重新实现搜索客户端，见SpringSearchClient.java。
+
+此代码将 LdapTemplate 的创建提取到外部配置文件。 @Autowired 注解指示 Spring 注入 ldapTemplate 依赖项。这极大地简化了搜索客户端类，并帮助您专注于搜索逻辑。
+首先创建一个新的 ClassPathXmlApplicationContext 实例。 这 ClassPathXmlApplicationContext 将 applicationContext.xml 文件作为其范围。 然后您从上下文中检索 SpringSearchClient 的实例并调用搜索方法。
+
+## Spring LdapTemplate 操作
+
+使用 LdapTemplate 在 LDAP 中添加、删除和修改信息。
+
+### 添加操作
+
+LdapTemplate 类提供了几个绑定方法，允许您创建新的 LDAP 条目。其中最简单的方法如下：
+`public void bind(String dn, Object obj, Attributes attributes)`
+此方法的第一个参数是需要绑定的对象的唯一可分辨名称。第二个参数是要绑定的对象，通常是 DirContext 接口的实现。第三个参数是要绑定的对象的属性。这三个中，只有第一个参数是必需的，其余两个可以传递 null。
+通过创建 BasicAttributes 类的新实例来保存读者属性。通过将属性名称和值传递给 put 方法来添加单值属性。要添加多值属性对象类，请创建 BasicAttribute 的新实例。然后将条目的 objectClass 值添加到 objectClassAttribute 并将其添加到属性列表中。最后，使用读者信息和读者的完全限定 DN 调用 LdapTemplate 上的绑定方法。这会将读者条目添加到 LDAP 服务器。
+
+### 修改操作
+
+考虑您要向新添加的顾客添加电话号码的场景。 为此，LdapTemplate 提供了一个方便的 modifyAttributes 方法，其签名如下：
+`public void modifyAttributes(String dn, ModificationItem[] mods)`
+modifyAttributes 方法的这种变体将要修改的条目的完全限定唯一 DN 作为其第一个参数。 第二个参数接受一个ModificationItems数组，其中每个修改项保存需要修改的属性信息。
+
+在这个实现中，您只需创建一个新的 BasicAttribute 电话信息。 然后你新建一个ModificationItem并传入ADD_ATTRIBUTE代码，表示你正在添加一个属性。 最后，您调用 带有读者 DN 和修改项目的 modifyAttributes 方法。 DirContext 有一个 REPLACE_ATTRIBUTE 代码，使用时将替换属性的值。 同样，REMOVE_ATTRIBUTE 代码将从属性中删除指定的值。
+
+### 删除操作
+
+与添加和修改类似，LdapTemplate 使用 unbind 方法可以轻松删除条目。

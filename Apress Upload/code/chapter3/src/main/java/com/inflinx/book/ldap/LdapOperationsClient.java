@@ -25,7 +25,7 @@ public class LdapOperationsClient {
 		Attributes attributes = new BasicAttributes();
 		attributes.put("sn", "Patron999");
 		attributes.put("cn", "New Patron999");
-		
+	
 		// Add the multi-valued attribute
 		BasicAttribute objectClassAttribute = new BasicAttribute("objectclass");
 		objectClassAttribute.add("top");

@@ -23,22 +23,21 @@ public class SpringSearchClient {
 	@SuppressWarnings("unchecked")
 	public List<String> search() {
 		
-		List<String> nameList = ldapTemplate.search("dc=inflinx,dc=com", "(objectclass=person)", 
+		return ldapTemplate.search("dc=inflinx,dc=com", "(objectclass=person)", 
 				new AttributesMapper() {
 					@Override
 					public Object mapFromAttributes(Attributes attributes) throws NamingException {
 						return (String)attributes.get("cn").get();
-					} });		
-		return nameList;
+					} });
 	}
 	
 	public static void main(String[] args) {
 		ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 		SpringSearchClient client = context.getBean(SpringSearchClient.class);
-		List<String> names = client.search();
-		
+		List<String> names = client.search();	
 		for(String name: names) {
 			System.out.println(name);
 		}
+		((ClassPathXmlApplicationContext) context).close();
 	}
 }
