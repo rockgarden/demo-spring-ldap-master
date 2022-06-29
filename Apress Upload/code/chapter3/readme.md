@@ -110,13 +110,15 @@ Apache Directory Studio 是一种流行的开源 LDAP 浏览器，可以帮助�
 ## 加载测试数据
 
 在前面的部分中，您安装了 OpenDJ LDAP 服务器和 Apache Directory Studio 以访问 LDAP 服务器。 设置开发/测试环境的最后一步是使用测试数据加载 LDAP 服务器。
-> 注意 随附的源代码/下载包含两个 LdIF 文件，patrons.ldif 和 employees.ldif。 顾客.ldif 文件包含模拟图书馆顾客的测试数据。 employees.ldif 文件包含模拟图书馆员工的测试数据。 这两个文件大量用于测试本书中使用的代码。
+> 注意 随附的源代码/下载包含两个 LdIF 文件，patrons.ldif 和 employees.ldif。 顾客.ldif 文件包含模拟图书馆顾客的测试数据。 employees.ldif 文件包含模拟图书馆员工的测试数据。
 
 以下是加载测试数据的步骤。
 
 1. 在 LDAP 浏览器窗格中右键单击“Root DSE”并选择`Import ➤ LDIF Import`
 2. 浏览这个patans.ldif 文件并点击Finish 按钮。 确保选中“Update existing entries”复选框。
 3. 成功导入后，您将看到 dc=inflinx,dc=com 条目下加载的数据。
+
+Error: `[LDAP result code 53 - unwillingToPerform] no global superior knowledge`.
 
 ## 搜索客户端示例
 

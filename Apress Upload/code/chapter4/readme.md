@@ -71,6 +71,16 @@ public class StringUtilsTest {
 请注意，我遵循了 `<Class Under Test>Test` 约定来命名测试类。 在 JUnit 4.x 之前，测试方法需要以单词“test”开头。 在 4.x 中，测试方法只需要使用注解 @Test 进行标记。 还要注意 testIsEmpty 方法包含几个用于测试 isEmpty 方法逻辑的断言。
 下表列出了 JUnit 4 中可用的一些重要注解。
 
+| Annotation   | Description                                                                                                                                                 | 描述                                                  |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| @Test        | Annotates a method as a JUnit test method. The method should be of public scope and have void return type.                                                  | 将方法注释为 JUnit 测试方法。 该方法应该是公共范围的并且具有 void 返回类型。       |
+| @Before      | Marks a method to run before every test method. Useful for setting up test fixtures. The @Before method of a superclass is run before the current class.    | 标记要在每个测试方法之前运行的方法。 用于设置测试夹具。 超类的@Before 方法在当前类之前运行。 |
+| @After       | Marks a method to be run after every test method. Useful for tearing down test fixtures. The @After method of a superclass is run before the current class. | 标记要在每个测试方法之后运行的方法。 用于拆除测试夹具。 超类的@After 方法在当前类之前运行。  |
+| @Ignore      | Marks a method to be ignored during test runs. This helps avoid the need for commenting half-baked test methods.                                            | 标记在测试运行期间要忽略的方法。 这有助于避免评论半生不熟的测试方法的需要。              |
+| @BeforeClass | Annotates a method to run before any test method is run. For a test case, the method is run only once and can be used to provide class level setup work.    | 在运行任何测试方法之前注释要运行的方法。 对于测试用例，该方法只运行一次，可用于提供类级别的设置工作。 |
+| @AfterClass  | Annotates a method to run after all the test methods are run. This can be useful for performing any cleanups at a class level.                              | 在运行所有测试方法后注释要运行的方法。 这对于在类级别执行任何清理很有用。               |
+| @RunWith     | Specifies the class that is used to run the JUnit test case.                                                                                                | 指定用于运行 JUnit 测试用例的类。                                |
+
 ## 使用嵌入式 LDAP 服务器进行测试
 
 ApacheDS、OpenDJ 和 UnboundID 是可以嵌入到 Java 应用程序中的开源 LDAP 目录。嵌入式目录是应用程序 JVM 的一部分，可以轻松自动执行启动和关闭等任务。它们的启动时间很短，通常运行速度很快。嵌入式目录还消除了对每个开发人员或构建机器的专用独立 LDAP 服务器的需求。
