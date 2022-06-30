@@ -2,27 +2,24 @@ package com.inflinx.book.ldap;
 
 import java.util.List;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.stereotype.Component;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 @Component
 public class SearchClient {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("unchecked")
 	public List<String> search() {
 		LdapTemplate ldapTemplate = getLdapTemplate();
 		return ldapTemplate.search("dc=inflinx,dc=com", "(objectclass=person)",
-				new AttributesMapper() {
-					@Override
-					public Object mapFromAttributes(Attributes attributes) throws NamingException {
-						return attributes.get("cn").get();
-					}
-				});
+				(AttributesMapper) attributes -> attributes.get("cn").get());
 	}
 
 	private LdapTemplate getLdapTemplate() {
@@ -47,7 +44,7 @@ public class SearchClient {
 		List<String> names = client.search();
 
 		for (String name : names) {
-			System.out.println(name);
+			LOGGER.trace(name);
 		}
 	}
 }

@@ -94,6 +94,8 @@ pom.xml 文件中的附加部分包含有关 Maven 可用于编译和构建代�
 
 ## LDAP 服务器设置
 
+### opendJ 安装
+
 安装 LDAP 服务器来测试您的 LDAP 代码。 在可用的开源 LDAP 服务器中，OpenDJ 非常易于安装和配置。
 > 注意 即使您已经有可用的测试 LdAP 服务器，我强烈建议您按照以下步骤安装 opendJ LdAP 服务器。 您将大量使用此实例来测试本书中的代码。
 
@@ -101,11 +103,22 @@ pom.xml 文件中的附加部分包含有关 Maven 可用于编译和构建代�
 
 [从 Docker 运行 OpenDJ](https://hub.docker.com/r/openidentityplatform/opendj/)
 
+### opendJ 设置
+
+服务器设置，将侦听器端口从 389 更改为 11389，将管理连接器端口从 4444 更改为 4445。并使用 opendj 作为密码
+在拓扑选项，保留“standalone server””选项。
+在 Directory Data ，输入值“dc=inflinx,dc=com”作为 Directory Base DN。
+
 ### 安装 Apache Directory Studio
 
 Apache Directory Studio 是一种流行的开源 LDAP 浏览器，可以帮助您非常轻松地浏览 LDAP 目录。要安装 Apache Directory Studio，请从以下位置下载安装程序文件 <http://directory.apache.org/studio/downloads.html>。
 
 [在macOS中安装](https://directory.apache.org/studio/download/download-macosx.html)
+
+配置LDAP链接。
+
+> Error:`[LDAP result code 34 - invalidDNSyntax] invalid DN`
+可能是密码不对引起
 
 ## 加载测试数据
 
@@ -118,7 +131,8 @@ Apache Directory Studio 是一种流行的开源 LDAP 浏览器，可以帮助�
 2. 浏览这个patans.ldif 文件并点击Finish 按钮。 确保选中“Update existing entries”复选框。
 3. 成功导入后，您将看到 dc=inflinx,dc=com 条目下加载的数据。
 
-Error: `[LDAP result code 53 - unwillingToPerform] no global superior knowledge`.
+> Error: `[LDAP result code 53 - unwillingToPerform] no global superior knowledge`.
+可能是没有配置相应的dn引起。
 
 ## 搜索客户端示例
 

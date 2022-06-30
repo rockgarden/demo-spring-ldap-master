@@ -19,13 +19,15 @@ public class LdapOperationsClient {
 	@Autowired
 	@Qualifier("ldapTemplate")
 	private LdapTemplate ldapTemplate;
-	
+
+	private static final String DN_1 = "uid=patron999,ou=patrons,dc=inflinx,dc=com";
+
 	public void addPatron() {
 		// Set the Patron attributes
 		Attributes attributes = new BasicAttributes();
 		attributes.put("sn", "Patron999");
 		attributes.put("cn", "New Patron999");
-	
+
 		// Add the multi-valued attribute
 		BasicAttribute objectClassAttribute = new BasicAttribute("objectclass");
 		objectClassAttribute.add("top");
@@ -33,20 +35,20 @@ public class LdapOperationsClient {
 		objectClassAttribute.add("organizationalperson");
 		objectClassAttribute.add("inetorgperson");
 		attributes.put(objectClassAttribute);
-		
-		ldapTemplate.bind("uid=patron999,ou=patrons,dc=inflinx,dc=com", null, attributes);
+
+		ldapTemplate.bind(DN_1, null, attributes);
 	}
-	
-	public void addTelephoneNumber() {		
+
+	public void addTelephoneNumber() {
 		Attribute attribute = new BasicAttribute("telephoneNumber", "801 100 1000");
 		ModificationItem item = new ModificationItem(DirContext.ADD_ATTRIBUTE, attribute);
-		ldapTemplate.modifyAttributes("uid=patron999,ou=patrons,dc=inflinx,dc=com", new ModificationItem[] {item});
+		ldapTemplate.modifyAttributes(DN_1, new ModificationItem[] { item });
 	}
-	
+
 	public void removePatron() {
-		ldapTemplate.unbind("uid=patron999,ou=patrons,dc=inflinx,dc=com");
+		ldapTemplate.unbind(DN_1);
 	}
-	
+
 	public static void main(String[] args) {
 		ApplicationContext context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 		LdapOperationsClient client = context.getBean(LdapOperationsClient.class);

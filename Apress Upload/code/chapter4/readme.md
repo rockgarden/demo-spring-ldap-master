@@ -84,6 +84,103 @@ public class StringUtilsTest {
 ## 使用嵌入式 LDAP 服务器进行测试
 
 ApacheDS、OpenDJ 和 UnboundID 是可以嵌入到 Java 应用程序中的开源 LDAP 目录。嵌入式目录是应用程序 JVM 的一部分，可以轻松自动执行启动和关闭等任务。它们的启动时间很短，通常运行速度很快。嵌入式目录还消除了对每个开发人员或构建机器的专用独立 LDAP 服务器的需求。
-> 注意 这里讨论的概念是 LdapUnit 开源项目的基础。在以后的所有章节中，您将使用 LdapUnit 来测试代码。请访问 <http://ldapunit.org> 下载项目工件并浏览完整的源代码。
+> 注意 这里讨论的概念是 LdapUnit 开源项目的基础。您将使用 LdapUnit 来测试代码。请访问 <http://ldapunit.org> 下载项目工件并浏览完整的源代码。
 
 嵌入 LDAP 服务器涉及以编程方式创建服务器并启动/停止它。然而，尽管它们很成熟，但以编程方式与 ApacheDS 或 OpenDJ 交互还是很麻烦。
+
+### 设置嵌入式 ApacheDS
+
+ApacheDS 的核心是存储数据并支持搜索操作的目录服务。因此，启动 ApacheDS LDAP 服务器首先涉及创建和配置目录服务。使用 DefaultDirectoryServiceFactory 并对其进行初始化。
+
+ApacheDS 使用分区partitions来存储 LDAP 条目entries。（一个分区可以看作是一个包含整个 DIT 的逻辑容器）。单个 ApacheDS 实例可能有多个分区。与每个分区相关联的是一个称为分区后缀的根专有名称 (DN)。该分区中的所有条目都存储在该根 DN 下。创建一个分区并将其添加到 directoryService 中。
+
+您使用分区工厂创建分区。为了创建新分区，您必须提供以下信息：唯一标识分区的名称、分区后缀或 rootDn、缓存大小和工作目录。使用了 rootDn 作为分区名称。
+创建和配置目录服务后，下一步是创建 LDAP 服务器。对于新创建的 LDAP 服务器，您提供一个名称。然后创建一个 TcpTransport 对象，它将在端口 12389 上进行侦听。TcpTransport 实例允许客户端与您的 LDAP 服务器进行通信。
+
+#### 创建嵌入式上下文工厂
+
+使用上述代码，下一步是自动启动服务器并创建可用于与嵌入式服务器交互的上下文。 在 Spring 中，您可以通过实现创建 ContextSource 的新实例的自定义 FactoryBean 来实现这一点。 创建上下文工厂。
+
+EmbeddedContextSourceFactory bean 使用两个 setter 方法：setPort 和 setRootDn。 setPort 方法可用于设置嵌入式服务器应运行的端口。 setRootDn 方法可用于提供根上下文的名称。 createInstance 方法的实现，它创建了一个新的 ApacheDSConfigurer 实例并启动了服务器。 然后它创建一个新的 LdapContenxtSource 并使用嵌入式 LDAP 服务器信息填充它。
+
+提供了 destroyInstance 的实现。 它只涉及清理创建的上下文并停止嵌入式服务器。
+
+最后一步是创建一个使用新上下文工厂的 Spring 上下文文件。 请注意，嵌入式上下文源被注入到 ldapTemplate 中。
+
+现在您拥有编写 JUnit 测试用例所需的整个基础架构。 简单的 JUnit 测试用例。 这个测试用例有一个在每个测试方法之前运行的设置方法。 在设置方法中，您加载数据，以便 LDAP 服务器处于已知状态。 从 employees.ldif 文件中加载数据。 拆解方法在每个测试方法运行后运行。 在 teardown 方法中，您将删除 LDAP 服务器中的所有条目。 这将允许您从新测试开始干净。 三种测试方法都很简陋，简单的在控制台打印信息。
+
+## 使用 EasyMock 模拟 LDAP
+
+EasyMock 是一个开源库，可以轻松创建和使用模拟对象。 从 3.0 版开始，EasyMock 原生支持模拟接口和具体类。 最新版本的 EasyMock 可以从 <http://easymock.org/Downloads.html> 下载。 为了模拟具体的类，需要另外两个库，即 CGLIB 和 Objenesis。 
+
+Maven 用户只需在 pom.xml 中添加以下依赖即可获取所需的 jar 文件：
+
+```xml
+<dependency>
+   <groupId>org.easymock</groupId>
+   <artifactId>easymock</artifactId>
+   <version>3.2</version>
+   <scope>test</scope>
+</dependency>
+```
+
+使用 EasyMock 创建模拟需要调用 EasyMock 类。以下示例为 LdapTemplate 创建一个模拟对象：
+`LdapTemplate ldapTemplate = EasyMock.createMock(LdapTemplate.class);`
+每个新创建的模拟对象都以录制模式开始。在这种模式下，您记录模拟的预期行为或期望expectation。
+例如，您可以告诉模拟，如果调用此方法，则返回此值。
+例如，以下代码为 LdapTemplate 模拟添加了新的期望：
+`EasyMock.expect(ldapTemplate.bind(isA(DirContextOperations.class)));`
+在此代码中，您将指示模拟绑定方法将被调用，并且 DirContextOperations 的实例将作为其参数传入。
+一旦记录了所有期望，模拟就需要能够重放这些期望。这是通过调用 EasyMock 上的重播方法并传入需要重播的模拟对象作为参数来完成的。
+`EasyMock.replay(ldapTemplate);`
+模拟对象现在可以在测试用例中使用。一旦被测代码完成执行，您可以验证是否满足模拟的所有期望。这是通过调用 EasyMock 上的 verify 方法来完成的。
+`EasyMock.verify(ldapTemplate);`
+模拟对于验证搜索方法中使用的上下文行映射器context row mappers特别有用。如您之前所见，行映射器实现将 LDAP 上下文/条目转换为 Java 域对象domain object。这是执行转换的 ContextMapper 接口中的方法签名：
+`public Object mapFromContext(Object ctx)`
+此方法中的 ctx 参数通常是 DirContextOperations 实现的实例。因此，为了对 ContextMapper 实现进行单元测试，您需要将模拟 DirContextOperations 实例传递给 mapFromContext 方法。模拟 DirContextOperations 应该返回虚拟但有效的数据，以便 ContextMapper 实现可以从中创建域对象。LdapMockUtils.java 中的 DirContextOperations 方法显示了模拟和填充实例。 mockContextOperations 循环通过传入的虚拟属性数据并添加对单值和多值属性的期望。
+
+## 测试数据生成
+
+出于测试目的，您通常需要生成初始测试数据。 OpenDJ 提供了一个很棒的命令行实用程序，称为 make-ldif，它使生成测试 LDAP 数据变得轻而易举。
+make-ldif 工具需要用于创建测试数据的模板。 Pater.template 文件来生成顾客条目。
+
+```txt
+define suffix=dc=inflinx,dc=com define maildomain=inflinx.com define numusers=101
+branch: [suffix]
+branch: ou=patrons,[suffix] subordinateTemplate: person:[numusers]
+template: person
+rdnAttr: uid
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+givenName: <first>
+sn: <last>
+cn: {givenName} {sn}
+initials: {givenName:1}<random:chars:ABCDEFGHIJKLMNOPQRSTUVWXYZ:1>{sn:1}
+employeeNumber: <sequential:0>
+uid: patron<sequential:0>
+mail: {uid}@[maildomain]
+userPassword: password
+telephoneNumber: <random:telephone>
+homePhone: <random:telephone>
+mobile: <random:telephone>
+street: <random:numeric:5> <file:streets> Street
+l: <file:cities>
+st: <file:states>
+postalCode: <random:numeric:5>
+postalAddress: {cn}${street}${l}, {st} {postalCode}
+```
+
+这是对安装时开箱即用的 example.template 文件的简单修改。 example.template 位于 `<OpenDJ_Install>\config\ MakeLDIF` 文件夹中。 uid 已修改为使用前缀“patron”而不是“user”。此外，numUsers 值已更改为 101。这表示您希望脚本生成的测试用户数。要生成测试数据，请在命令行中运行以下命令：
+
+```bash
+C:\practicalldap\opendj\bat>make-ldif --ldifFile
+c:\practicalldap\testdata\patrons.ldif --templateFile
+c:\practicalldap\templates\patron.template --randomSeed 1
+```
+
+- --ldifFile 选项用于指定目标文件位置。在这里，您将其存储在 testdata 目录中的名称 Patrons.ldif 下
+- --templateFile 用于指定要使用的模板文件。
+- --randomSeed 是一个整数，需要用于为数据生成期间使用的随机数生成器播种。
+创建成功后，除了 101 个测试条目之外，该脚本还创建了两个额外的基本条目。

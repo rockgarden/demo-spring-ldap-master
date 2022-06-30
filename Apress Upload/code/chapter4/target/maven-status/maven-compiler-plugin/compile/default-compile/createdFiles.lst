@@ -1,0 +1,6 @@
+com/inflinx/book/ldap/test/LdapUnitUtils.class
+com/inflinx/book/ldap/mock/LdapMockUtils.class
+com/inflinx/book/ldap/EmployeeContextMapper.class
+com/inflinx/book/ldap/test/EmbeddedContextSourceFactory.class
+com/inflinx/book/ldap/test/ApacheDSConfigurer.class
+com/inflinx/book/ldap/domain/Employee.class
