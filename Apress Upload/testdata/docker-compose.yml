@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  openldap:
+    image: docker.io/bitnami/openldap:2.6
+    ports:
+      - '1389:1389'
+      - '1636:1636'
+    environment:
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=adminpassword
+      - LDAP_USERS=user01,user02
+      - LDAP_PASSWORDS=password1,password2
+      - LDAP_ROOT=dc=inflinx,dc=com
+      - LDAP_BIND_DN=cn=admin,dc=inflinx,dc=com
+      - LDAP_ENABLE_TLS=yes
+      - LDAP_TLS_CERT_FILE=/opt/bitnami/openldap/certs/openldap.crt
+      - LDAP_TLS_KEY_FILE=/opt/bitnami/openldap/certs/openldap.key
+      - LDAP_TLS_CA_FILE=/opt/bitnami/openldap/certs/openldapCA.crt
+    volumes:
+      # - 'openldap_data:/bitnami/openldap'
+      - /tmp:/opt/bitnami/openldap/certs
+      - /tmp:/bitnami/openldap/
+
+volumes:
+  openldap_data:
+    driver: local

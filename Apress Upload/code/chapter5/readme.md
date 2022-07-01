@@ -46,3 +46,52 @@ SimpleLdapTemplate 的实际创建将在外部配置文件中完成， 即带有
 通过将基数设置为“ou=employees,dc=inflinx,dc=com”，您已将所有 LDAP 操作限制在 LDAP 树的员工分支中。重要的是要了解使用此处创建的上下文将无法对分支“ou=patrons”进行搜索操作。如果要求搜索 LDAP 树的所有分支，则基本属性需要为空字符串。
 LdapContextSource 的一个重要属性是 dirObjectFactory，可用于设置要使用的 DirObjectFactory。然而，在示例文件中，您没有使用此属性来指定您使用 DefaultDirObjectFactory 的意图。这是因为默认情况下 LdapContextSource 将 DefaultDirObjectFactory 注册为其 DirObjectFactory。
 在配置文件的最后部分，您有 SimpleLdapTemplate bean 声明。您已将 LdapContextSource bean 作为构造函数参数传递给 SimpleLdapTemplate。
+
+### 实现查找器方法
+
+实现 Employee DAO 的 findAll 方法需要在 LDAP 中搜索所有员工条目并使用返回的条目创建 Employee 实例。 为此，您将在 SimpleLdapTemplate 类中使用以下方法：
+`public <T> List<T> search(String base, String filter, ParameterizedContextMapper<T> mapper)`
+
+由于您使用的是 DefaultDirObjectFactory，因此每次执行搜索或查找时，在 LDAP 树中找到的每个上下文都将作为 DirContextAdapter 的实例返回。 搜索方法接受一个基本参数和过滤器参数。 此外，它采用 `ParameterizedContextMapper<T>` 的实例。 搜索方法会将返回的 DirContextAdapters 传递给 `ParameterizedContextMapper<T>` 实例进行转换。
+`ParameterizedContextMapper<T>` 及其父接口 ContextMapper 保存从传入的 DirContextAdapter 填充域对象所需的映射逻辑。
+
+EmployeeContextMapper.java 提供了用于映射 Employee 实例的上下文映射器实现。 可以看到，EmployeeContextMapper扩展了AbstractParameterizedContextMapper，这是一个实现ParameterizedContextMapper的抽象类。
+其中 doMapFromContext 方法的 DirContextOperations 参数是 DirContextAdapter 的接口。 如您所见，doMapFromContext 实现涉及创建一个新的 Employee 实例并从提供的上下文中读取您感兴趣的属性。
+有了 EmployeeContextMapper，findAll 方法的实现就变得微不足道了。 由于所有员工条目都有 objectClass inetOrgPerson，因此您将使用“(objectClass=inetOrgPerson)”作为搜索过滤器。 EmployeeDaoLdapImpl.java 显示了 findAll 的实现。
+
+另一种查找器方法可以通过两种方式实现：使用过滤器 `(uid=<supplied employee id>)` 搜索 LDAP 树或使用员工 DN 执行 LDAP 查找。 由于使用过滤器的搜索操作比查找 DN 更昂贵，因此您将使用查找来实现 find 方法。 EmployeeDaoLdapImpl.java 显示了 find 方法的实现。
+
+您通过为员工构造一个 DN 来开始实施。 由于初始上下文库仅限于员工分支，因此您刚刚指定了员工条目的 RDN 部分。 然后使用查找方法查找员工条目并使用 EmployeeContextMapper 创建一个 Employee 实例。
+这结束了两种查找器方法的实现。 让我们创建一个 JUnit 测试类来测试您的 finder 方法。 测试用例如 EmployeeDaoLdapImplTest.java 所示。
+
+请注意，您已在 ContextConfiguration 中指定了 repositoryContext-test.xml。 在配置文件中，您使用 LdapUnit 框架的 EmbeddedContextSourceFactory 类创建了嵌入式上下文源。 嵌入式 LDAP 服务器是 OpenDJ 的一个实例（由属性 serverType 指定），将在端口 12389 上运行。
+JUnit 测试用例中的 setup 和 teardown 方法用于加载和删除测试员工数据。 employee.ldif 文件包含您将在本书中使用的测试数据。
+
+### 创建方法
+
+SimpleLdapTemplate 提供了几种绑定方法来将条目添加到 LDAP。 去创造
+一个新员工，您将使用以下绑定方法变体：
+`public void bind(DirContextOperations ctx)`
+此方法将 DirContextOperations 实例作为其参数。 bind 方法在传入的 DirContextOperations 实例上调用 getDn 方法并检索条目的完全限定 DN。 然后它将所有属性绑定到 DN 并创建一个新条目。
+
+Employee DAO 中 create 方法的实现如 EmployeeDaoLdapImpl.java 所示。 如您所见，您首先创建一个 DirContextAdapter 的新实例。
+然后，您使用员工信息填充上下文的属性。 请注意
+departmentNumber 的 int 值被显式转换为字符串。 如果未完成此转换，该方法将最终抛出“org.springframework. ldap.InvalidAttributeValueException”异常。 该方法的最后一行执行实际绑定。
+
+> 注意 DirContextAdapter 在简化属性操作方面做得很好。
+
+让我们用 EmployeeDaoLdapImplTest.java 中的 JUnit 测试用例快速验证 create 方法的实现。
+
+### 更新方法
+
+更新条目涉及添加、替换或删除其属性。 实现这一点的最简单方法是删除整个条目并使用一组新属性创建它。 这种技术称为重新绑定。 删除和重新创建条目显然效率不高，仅对更改的值进行操作更有意义。
+在第 3 章中，您使用了 modifyAttributes 和 ModificationItem 实例来更新 LDAP 条目。 尽管 modifyAttributes 是一个不错的方法，但手动生成 ModificationItem 列表确实需要大量工作。 值得庆幸的是，DirContextAdapter 可以自动执行此操作，并使更新条目变得轻而易举。 EmployeeDaoLdapImpl.java 显示了使用 DirContextAdapter 的更新方法实现。
+
+在这个实现中，您会注意到您首先使用员工的 DN 查找现有上下文。 然后像在 create 方法中一样设置所有属性。 （区别在于 DirContextAdapter 跟踪对条目所做的值更改。）最后，您将更新的上下文传递给 modifyAttributes 方法。 modifyAttributes 方法将从 DirContextAdapter 检索修改的项目列表，并对 LDAP 中的条目执行这些修改。 EmployeeDaoLdapImplTest.java 中的 testUpdate() 显示了更新员工名字的关联测试用例。
+
+### 删除方法
+
+Spring LDAP 使用 LdapTemplate/SimpleLdapTemplate 中的 unbind 方法简化了绑定。 EmployeeDaoLdapImpl.java 中的 delete(String id) 显示了删除员工所涉及的代码。
+
+由于您的操作都与以“ou=employees,dc=inflinx,dc=com”为基础的初始上下文相关，因此您只需使用条目的 RDN uid 创建 DN。 调用 unbind 操作将删除该条目及其所有相关属性。
+EmployeeDaoLdapImplTest.java 中的 testDelete() 显示了用于验证条目删除的关联测试用例。 成功删除条目后，对该名称的任何查找操作都将导致 NameNotFoundException。 测试用例验证了这个假设。

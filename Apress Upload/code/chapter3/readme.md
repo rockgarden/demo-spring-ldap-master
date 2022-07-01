@@ -103,6 +103,35 @@ pom.xml 文件中的附加部分包含有关 Maven 可用于编译和构建代�
 
 [从 Docker 运行 OpenDJ](https://hub.docker.com/r/openidentityplatform/opendj/)
 
+```bash
+~ % docker run -h ldap-01.inflinx.com -p 1389:1389 -p 1636:1636 -p 4444:4444 --name ldap-01 openidentityplatform/opendj \
+--env BASE_DN="dc=inflinx,dc=com" \
+--env ROOT_USER_DN="root" \
+--env ROOT_PASSWORD="wangkan77"
+
+Instance data Directory is empty. Creating new DJ instance
+BASE DN is dc=example,dc=com
+Password set to password
+Running /opt/opendj/bootstrap/setup.sh
+Setting up default OpenDJ instance
+
+Configuring Directory Server ..... Done.
+Configuring Certificates ..... Done.
+Creating Base Entry dc=example,dc=com ..... Done.
+
+To see basic server configuration status and configuration, you can launch
+/opt/opendj/bin/status
+```
+
+```bash
+docker run -it --rm --entrypoint /opt/opendj/bin/import-ldif \
+-v patrons.ldif:/opt/opendj/import-data/patrons.ldif openidentityplatform/opendj \ 
+-b dc=inflinx,dc=com \
+-D 'cn=Directory Manager' \
+-h opendj -p 1389 -w passw0rd \
+-l /opt/opendj/import-data/patrons.ldif
+```
+
 ### opendJ 设置
 
 服务器设置，将侦听器端口从 389 更改为 11389，将管理连接器端口从 4444 更改为 4445。并使用 opendj 作为密码
