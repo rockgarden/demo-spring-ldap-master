@@ -13,7 +13,7 @@ import org.springframework.ldap.core.DirContextOperations;
 import com.inflinx.book.ldap.EmployeeContextMapper;
 import com.inflinx.book.ldap.domain.Employee;
 
-public class ContextMapperExample {
+public class TestContextMapper {
 
 	@Test
 	public void testConextMapper() {
@@ -34,8 +34,8 @@ public class ContextMapperExample {
 		verify(contextOperations);
 		
 		// test the employee object
-		assertEquals(employee.getUid(), "employee1");
-		assertEquals(employee.getFirstName(), "John");
+		assertEquals("employee1", employee.getUid());
+		assertEquals("John", employee.getFirstName());
 	}
 	
 }

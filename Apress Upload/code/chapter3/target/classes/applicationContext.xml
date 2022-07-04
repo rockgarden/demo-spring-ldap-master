@@ -7,17 +7,13 @@
 	<context:component-scan base-package="com.inflinx.book.ldap" />
 
 	<bean id="contextSource" class="org.springframework.ldap.core.support.LdapContextSource">
-		<property name="url" value="ldap://localhost:11389" />
-		<property name="userDn" value="cn=Directory Manager" />
-		<property name="password" value="opendj" />
+		<property name="url" value="ldap://localhost:1389" />
+		<property name="userDn" value="cn=Directory Manager WK" />
+		<property name="password" value="passwordwk" />
 	</bean>
 
 	<bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
 		<constructor-arg ref="contextSource" />
 	</bean>
 	<context:component-scan base-package="com.inflinx.book.ldap"/>
-	<!-- 当应用程序加载上下文时，Spring 创建一个 SimplePojo 实例并对其进行管理。 -->
-	<bean id="myBean" class="com.inflinx.book.ldap.SimplePojo">
-	</bean>
-
 </beans>

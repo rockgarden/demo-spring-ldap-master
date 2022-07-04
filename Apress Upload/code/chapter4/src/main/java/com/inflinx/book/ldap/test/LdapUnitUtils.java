@@ -16,75 +16,65 @@ import org.springframework.ldap.schema.BasicSchemaSpecification;
 
 public class LdapUnitUtils {
 
-	public static void loadData(ContextSource contextSource, Resource ldifFile) throws Exception
-	{
+	private LdapUnitUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
+	public static void loadData(ContextSource contextSource, Resource ldifFile) throws Exception {
 		DirContext ctx = null;
 		try {
 			ctx = contextSource.getReadWriteContext();
 			loadData(ctx, ldifFile);
-		}
-		finally {
+		} finally {
 			try {
 				ctx.close();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				// Never mind this
 			}
 		}
 	}
-	
-	public static void loadData(DirContext ctx, Resource ldifFile) throws Exception
-	{
+
+	public static void loadData(DirContext ctx, Resource ldifFile) throws Exception {
 		LdifParser parser = new LdifParser(ldifFile);
 		parser.setRecordSpecification(new BasicSchemaSpecification());
 		parser.open();
 		LdapAttributes attributes;
 		while (parser.hasMoreRecords()) {
-			try
-			{
+			try {
 				attributes = parser.getRecord();
-				if (attributes != null && attributes.getDN() !=null) 
-				{
-					if(isEntryPresent(ctx, attributes.getDN()))
-					{
+				if (attributes != null && attributes.getDN() != null) {
+					if (isEntryPresent(ctx, attributes.getDN())) {
 						ctx.rebind(attributes.getDN(), attributes);
-					}
-					else
-					{
-						ctx.createSubcontext(attributes.getDN(), attributes);	
+					} else {
+						ctx.createSubcontext(attributes.getDN(), attributes);
 					}
 				}
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		parser.close();
 	}
-	
-	
+
 	public static boolean isEntryPresent(DirContext context, Name name) {
-		
+
 		try {
 			context.lookup(name);
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	public static void clearSubContexts(ContextSource contextSource, Name name) throws NamingException {
 		DirContext ctx = null;
 		try {
 			ctx = contextSource.getReadWriteContext();
 			clearSubContexts(ctx, name);
-		}
-		finally {
+		} finally {
 			try {
 				ctx.close();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				// Never mind this
 			}
 		}
@@ -101,24 +91,20 @@ public class LdapUnitUtils {
 
 				try {
 					ctx.destroySubcontext(childName);
-				}
-				catch (ContextNotEmptyException e) {
+				} catch (ContextNotEmptyException e) {
 					clearSubContexts(ctx, childName);
 					ctx.destroySubcontext(childName);
 				}
 			}
-		}
-		catch (NamingException e) {
+		} catch (NamingException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
 				enumeration.close();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				// Never mind this
 			}
 		}
 	}
-	
+
 }

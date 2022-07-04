@@ -1,4 +1,4 @@
-package com.inflinx.book.ldap.repository;
+package com.inflinx.book.ldap.test;
 
 import javax.naming.Binding;
 import javax.naming.ContextNotEmptyException;
@@ -6,8 +6,8 @@ import javax.naming.Name;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
-import javax.naming.ldap.LdapName;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DistinguishedName;
@@ -16,6 +16,14 @@ import org.springframework.ldap.ldif.parser.LdifParser;
 import org.springframework.ldap.schema.BasicSchemaSpecification;
 
 public class LdapUnitUtils {
+
+	private LdapUnitUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
+	public static void loadData(ContextSource contextSource, Resource ldifFile, Integer port) throws Exception {
+		loadData(contextSource, ldifFile);
+	}
 
 	public static void loadData(ContextSource contextSource, Resource ldifFile) throws Exception {
 		DirContext ctx = null;
@@ -54,13 +62,24 @@ public class LdapUnitUtils {
 	}
 
 	public static boolean isEntryPresent(DirContext context, Name name) {
-
 		try {
 			context.lookup(name);
 		} catch (Exception e) {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * TODO Implement the processing logic for the parameter "port".
+	 * TODO Auto-generated catch block
+	 * 
+	 * @param contextSource
+	 * @param name
+	 * @param port
+	 */
+	public static void clearSubContexts(ContextSource contextSource, Name name, Integer port) throws Exception {
+		clearSubContexts(contextSource, name);
 	}
 
 	public static void clearSubContexts(ContextSource contextSource, Name name) throws NamingException {
@@ -72,7 +91,7 @@ public class LdapUnitUtils {
 			try {
 				ctx.close();
 			} catch (Exception e) {
-				// Never mind this
+				e.printStackTrace();
 			}
 		}
 	}
@@ -83,10 +102,7 @@ public class LdapUnitUtils {
 			enumeration = ctx.listBindings(name);
 			while (enumeration.hasMore()) {
 				Binding element = (Binding) enumeration.next();
-				LdapName childNameL = new LdapName(element.getName());
-				System.out.println(childNameL);
 				DistinguishedName childName = new DistinguishedName(element.getName());
-				System.out.println(childName);
 				childName.prepend((DistinguishedName) name);
 				try {
 					ctx.destroySubcontext(childName);
@@ -101,7 +117,7 @@ public class LdapUnitUtils {
 			try {
 				enumeration.close();
 			} catch (Exception e) {
-				// Never mind this
+				e.printStackTrace();
 			}
 		}
 	}

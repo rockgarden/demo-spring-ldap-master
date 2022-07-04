@@ -10,13 +10,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
-// import org.springframework.ldap.core.DistinguishedName;
+import org.springframework.ldap.core.ContextSource;
+import org.springframework.ldap.core.DistinguishedName;
 import javax.naming.ldap.LdapName;
 import org.springframework.ldap.support.LdapUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.inflinx.book.ldap.domain.Employee;
+import com.inflinx.book.ldap.test.LdapUnitUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:repositoryContext-test.xml" })
@@ -29,19 +31,25 @@ public class EmployeeDaoLdapImplTest {
 	private EmployeeDao employeeDao;
 
 	@Autowired
+	ContextSource contextSource;
+	
+	@Autowired
 	private Integer port;
 
-	// @Before
-	// public void setup() throws Exception {
-	// 	System.out.println("Inside the setup");
-	// 	LdapUnitUtils.loadData(new ClassPathResource("employees.ldif"), port);
-	// }
+	@Before
+	public void setup() throws Exception {
+		System.out.println("Inside the setup");
+		// LdapUnitUtils.loadData(new ClassPathResource("employees.ldif"), port);
+		LdapUnitUtils.loadData(contextSource, new ClassPathResource("employees.ldif"), port);
+	}
+	
 
-	// @After
-	// public void teardown() throws Exception {
-	// 	System.out.println("Inside the teardown");
-	// 	LdapUnitUtils.clearSubContexts(new DistinguishedName(ROOT_DN), port);
-	// }
+	@After
+	public void teardown() throws Exception {
+		System.out.println("Inside the teardown");
+		// LdapUnitUtils.clearSubContexts(new DistinguishedName(ROOT_DN), port);
+		LdapUnitUtils.clearSubContexts(contextSource, new DistinguishedName(ROOT_DN), port);
+	}
 
 	@Test
 	public void testFindAll() {

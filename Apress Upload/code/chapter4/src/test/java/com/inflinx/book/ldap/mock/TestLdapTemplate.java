@@ -16,7 +16,7 @@ import org.springframework.ldap.core.LdapTemplate;
 import com.inflinx.book.ldap.EmployeeContextMapper;
 import com.inflinx.book.ldap.domain.Employee;
 
-public class LdapTemplateExample {
+public class TestLdapTemplate {
 	
 	@Test
 	public void testLdapTemplate() {
@@ -25,14 +25,10 @@ public class LdapTemplateExample {
 		
 		// Lets say we want to test the search method
 		LdapTemplate ldapTemplate = createMock(LdapTemplate.class);
-		
 		expect(ldapTemplate.search(eq(base), eq(search), isA(EmployeeContextMapper.class))).andReturn(getEmployeeList());
 		expectLastCall().anyTimes();
-		
 		replay(ldapTemplate);
-		
-		// LDAP Template is now ready for use. This can be injected into a DAO and tests can be run. 
-		
+		// LDAP Template is now ready for use. This can be injected into a DAO and tests can be run. 	
 	}
 	
 	private List<Employee> getEmployeeList() {

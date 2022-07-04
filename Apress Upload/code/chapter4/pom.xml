@@ -9,10 +9,10 @@
 	<name>chapter4</name>
 
 	<properties>
-		<org.springframework.version>4.3.30.RELEASE</org.springframework.version>
+		<org.springframework.version>5.3.21</org.springframework.version>
 		<org.springframework.ldap.version>2.3.8.RELEASE</org.springframework.ldap.version>
 		<org.aspectj.version>1.6.8</org.aspectj.version>
-		<org.slf4j.version>1.7.32</org.slf4j.version>
+		<org.slf4j.version>2.0.0-alpha7</org.slf4j.version>
 	</properties>
 
 	<dependencies>
@@ -136,6 +136,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${org.slf4j.version}</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -151,11 +152,16 @@
 		</dependency>
 		<!-- Spring Dependencies End -->
 
+		<!-- instead of log4j 1.2.17-->
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-			<scope>compile</scope>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.17.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.17.2</version>
 		</dependency>
 
 		<dependency>
@@ -183,8 +189,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.7</version>
-			<scope>test</scope>
+			<version>4.13.2</version>
 		</dependency>
 
 		<dependency>

@@ -7,19 +7,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
-import org.springframework.ldap.core.simple.SimpleLdapTemplate;
+import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.inflinx.book.ldap.domain.Employee;
 import com.inflinx.book.ldap.repository.mapper.EmployeeContextMapper;
-
 
 @Repository("employeeDao")
 public class EmployeeDaoLdapImpl implements EmployeeDao {
 
 	@Autowired
 	@Qualifier("ldapTemplate")
-	private SimpleLdapTemplate ldapTemplate;
+	private LdapTemplate ldapTemplate;
 	
 	@Override
 	public List<Employee> findAll() {

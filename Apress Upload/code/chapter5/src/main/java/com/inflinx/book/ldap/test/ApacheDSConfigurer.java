@@ -20,10 +20,14 @@ public class ApacheDSConfigurer {
 
 	private String rootDn;
 	private int port;
+	private String base;
+	private String serverType;
 
-	public ApacheDSConfigurer(String rootDn, int port) {
+	public ApacheDSConfigurer(String rootDn, int port, String base, String serverType) {
 		this.rootDn = rootDn;
 		this.port = port;
+		this.base = base;
+		this.serverType = serverType;
 	}
 
 	public void startServer() {

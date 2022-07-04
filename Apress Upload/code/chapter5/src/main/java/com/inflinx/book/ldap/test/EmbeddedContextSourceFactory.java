@@ -12,7 +12,9 @@ public class EmbeddedContextSourceFactory extends AbstractFactoryBean<ContextSou
 	
 	private int port;
 	private String rootDn;
-	
+	private String base;
+	private String serverType;
+
 	private ApacheDSConfigurer apacheDsConfigurer;
 	
 	@Override
@@ -22,7 +24,7 @@ public class EmbeddedContextSourceFactory extends AbstractFactoryBean<ContextSou
 	
 	@Override
 	protected ContextSource createInstance() throws Exception {
-		apacheDsConfigurer = new ApacheDSConfigurer(rootDn, port);
+		apacheDsConfigurer = new ApacheDSConfigurer(rootDn, port, base, serverType);
 		apacheDsConfigurer.startServer();
 
 		LdapContextSource targetContextSource = new LdapContextSource();
@@ -44,7 +46,16 @@ public class EmbeddedContextSourceFactory extends AbstractFactoryBean<ContextSou
 	public void setRootDn(String rootDn) {
 		this.rootDn = rootDn;
 	}
+
 	public void setPort(int port) {
 		this.port = port;
+	}
+
+	public void setBase(String base) {
+		this.base = base;
+	}
+
+	public void setServerType(String serverType) {
+		this.serverType = serverType;
 	}
 }
