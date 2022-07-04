@@ -84,34 +84,35 @@ public class StringUtilsTest {
 ## 使用嵌入式 LDAP 服务器进行测试
 
 ApacheDS、OpenDJ 和 UnboundID 是可以嵌入到 Java 应用程序中的开源 LDAP 目录。嵌入式目录是应用程序 JVM 的一部分，可以轻松自动执行启动和关闭等任务。它们的启动时间很短，通常运行速度很快。嵌入式目录还消除了对每个开发人员或构建机器的专用独立 LDAP 服务器的需求。
-> 注意 这里讨论的概念是 LdapUnit 开源项目的基础。您将使用 LdapUnit 来测试代码。请访问 <http://ldapunit.org> 下载项目工件并浏览完整的源代码。
+
+> 注意 这里讨论的概念是 LdapUnit 开源项目的基础。您将使用 LdapUnit 来测试代码。请访问 <http://ldapunit.org> 下载项目工件并浏览完整的源代码；但，网站无法访问！
 
 嵌入 LDAP 服务器涉及以编程方式创建服务器并启动/停止它。然而，尽管它们很成熟，但以编程方式与 ApacheDS 或 OpenDJ 交互还是很麻烦。
 
 ### 设置嵌入式 ApacheDS
 
-ApacheDS 的核心是存储数据并支持搜索操作的目录服务。因此，启动 ApacheDS LDAP 服务器首先涉及创建和配置目录服务。使用 DefaultDirectoryServiceFactory 并对其进行初始化。
+ApacheDS 的核心是存储数据并支持搜索操作的目录服务。因此，启动 ApacheDS LDAP 服务器首先涉及创建和配置目录服务。 ApacheDSConfigurer.java 显示了与创建目录服务相关的代码，即使用 DefaultDirectoryServiceFactory 并对其进行初始化。
 
-ApacheDS 使用分区partitions来存储 LDAP 条目entries。（一个分区可以看作是一个包含整个 DIT 的逻辑容器）。单个 ApacheDS 实例可能有多个分区。与每个分区相关联的是一个称为分区后缀的根专有名称 (DN)。该分区中的所有条目都存储在该根 DN 下。创建一个分区并将其添加到 directoryService 中。
+ApacheDS 使用分区partitions来存储 LDAP 条目entries。（一个分区可以看作是一个包含整个 DIT 的逻辑容器）。单个 ApacheDS 实例可能有多个分区。与每个分区相关联的是一个称为分区后缀的根专有名称 (DN)。该分区中的所有条目都存储在该根 DN 下。 见 ApacheDSConfigurer.java 中的相关代码，使用 DefaultDirectoryServiceFactory 创建一个分区并将其添加到 directoryService 中。
 
 您使用分区工厂创建分区。为了创建新分区，您必须提供以下信息：唯一标识分区的名称、分区后缀或 rootDn、缓存大小和工作目录。使用了 rootDn 作为分区名称。
-创建和配置目录服务后，下一步是创建 LDAP 服务器。对于新创建的 LDAP 服务器，您提供一个名称。然后创建一个 TcpTransport 对象，它将在端口 12389 上进行侦听。TcpTransport 实例允许客户端与您的 LDAP 服务器进行通信。
+创建和配置目录服务后，下一步是创建 LDAP 服务器。参见 ApacheDSConfigurer.java，其中 LdapServer() 对于新创建的 LDAP 服务器，您提供一个名称。然后创建一个 TcpTransport 对象，它将在端口 12389 上进行侦听。TcpTransport 实例允许客户端与您的 LDAP 服务器进行通信。
 
 #### 创建嵌入式上下文工厂
 
-使用上述代码，下一步是自动启动服务器并创建可用于与嵌入式服务器交互的上下文。 在 Spring 中，您可以通过实现创建 ContextSource 的新实例的自定义 FactoryBean 来实现这一点。 创建上下文工厂。
+使用上述代码，下一步是自动启动服务器并创建可用于与嵌入式服务器交互的上下文。 在 Spring 中，您可以通过实现创建 ContextSource 的新实例的自定义 FactoryBean 来实现这一点。 在EmbeddedContextSourceFactory.java，开始创建上下文工厂。
 
 EmbeddedContextSourceFactory bean 使用两个 setter 方法：setPort 和 setRootDn。 setPort 方法可用于设置嵌入式服务器应运行的端口。 setRootDn 方法可用于提供根上下文的名称。 createInstance 方法的实现，它创建了一个新的 ApacheDSConfigurer 实例并启动了服务器。 然后它创建一个新的 LdapContenxtSource 并使用嵌入式 LDAP 服务器信息填充它。
 
 提供了 destroyInstance 的实现。 它只涉及清理创建的上下文并停止嵌入式服务器。
 
-最后一步是创建一个使用新上下文工厂的 Spring 上下文文件。 请注意，嵌入式上下文源被注入到 ldapTemplate 中。
+最后一步是创建一个使用新上下文工厂的 Spring 上下文文件。 参见 repositoryContext-test.xml， 注意，嵌入式上下文源被注入到 ldapTemplate 中。
 
 现在您拥有编写 JUnit 测试用例所需的整个基础架构。 简单的 JUnit 测试用例。 这个测试用例有一个在每个测试方法之前运行的设置方法。 在设置方法中，您加载数据，以便 LDAP 服务器处于已知状态。 从 employees.ldif 文件中加载数据。 拆解方法在每个测试方法运行后运行。 在 teardown 方法中，您将删除 LDAP 服务器中的所有条目。 这将允许您从新测试开始干净。 三种测试方法都很简陋，简单的在控制台打印信息。
 
 ## 使用 EasyMock 模拟 LDAP
 
-EasyMock 是一个开源库，可以轻松创建和使用模拟对象。 从 3.0 版开始，EasyMock 原生支持模拟接口和具体类。 最新版本的 EasyMock 可以从 <http://easymock.org/Downloads.html> 下载。 为了模拟具体的类，需要另外两个库，即 CGLIB 和 Objenesis。 
+EasyMock 是一个开源库，可以轻松创建和使用模拟对象。 从 3.0 版开始，EasyMock 原生支持模拟接口和具体类。 最新版本的 EasyMock 可以从 <http://easymock.org/Downloads.html> 下载。 为了模拟具体的类，需要另外两个库，即 CGLIB 和 Objenesis。
 
 Maven 用户只需在 pom.xml 中添加以下依赖即可获取所需的 jar 文件：
 
@@ -142,6 +143,9 @@ Maven 用户只需在 pom.xml 中添加以下依赖即可获取所需的 jar 文
 ## 测试数据生成
 
 出于测试目的，您通常需要生成初始测试数据。 OpenDJ 提供了一个很棒的命令行实用程序，称为 make-ldif，它使生成测试 LDAP 数据变得轻而易举。
+
+<https://github.com/OpenIdentityPlatform/OpenDJ/releases/download/4.5.0/opendj-4.5.0.zip>
+
 make-ldif 工具需要用于创建测试数据的模板。 Pater.template 文件来生成顾客条目。
 
 ```txt

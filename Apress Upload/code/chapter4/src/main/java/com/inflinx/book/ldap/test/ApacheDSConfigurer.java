@@ -27,7 +27,6 @@ public class ApacheDSConfigurer {
 	}
 
 	public void startServer() {
-
 		try {
 			System.out.println("Starting Embedded LDAP Server ....");
 			

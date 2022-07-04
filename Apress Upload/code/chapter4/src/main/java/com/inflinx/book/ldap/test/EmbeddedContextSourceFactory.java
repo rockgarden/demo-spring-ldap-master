@@ -22,7 +22,6 @@ public class EmbeddedContextSourceFactory extends AbstractFactoryBean<ContextSou
 	
 	@Override
 	protected ContextSource createInstance() throws Exception {
-		
 		apacheDsConfigurer = new ApacheDSConfigurer(rootDn, port);
 		apacheDsConfigurer.startServer();
 
