@@ -67,6 +67,8 @@ EmployeeContextMapper.java 提供了用于映射 Employee 实例的上下文映�
 请注意，您已在 ContextConfiguration 中指定了 repositoryContext-test.xml。 在配置文件中，您使用 LdapUnit 框架的 EmbeddedContextSourceFactory 类创建了嵌入式上下文源。 嵌入式 LDAP 服务器是 OpenDJ 的一个实例（由属性 serverType 指定），将在端口 12389 上运行。
 JUnit 测试用例中的 setup 和 teardown 方法用于加载和删除测试员工数据。 employee.ldif 文件包含您将在本书中使用的测试数据。
 
+> 注：org.ldapunit:ldapunit:jar:0.6.0 missing 不可用。
+
 ### 创建方法
 
 SimpleLdapTemplate 提供了几种绑定方法来将条目添加到 LDAP。 去创造

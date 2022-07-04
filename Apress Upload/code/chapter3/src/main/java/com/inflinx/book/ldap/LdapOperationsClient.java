@@ -22,6 +22,10 @@ public class LdapOperationsClient {
 
 	private static final String DN_1 = "uid=patron999,ou=patrons,dc=inflinx,dc=com";
 
+	/**
+	 * New entry cannot be added because an entry with that name already exists;
+	 * Remaining name 'uid=patron999,ou=patrons,dc=inflinx,dc=com
+	 */
 	public void addPatron() {
 		// Set the Patron attributes
 		Attributes attributes = new BasicAttributes();
@@ -55,5 +59,6 @@ public class LdapOperationsClient {
 		client.addPatron();
 		client.addTelephoneNumber();
 		client.removePatron();
+		((ClassPathXmlApplicationContext) context).close();
 	}
 }

@@ -103,8 +103,6 @@ pom.xml 文件中的附加部分包含有关 Maven 可用于编译和构建代�
 
 [从 Docker 运行 OpenDJ](https://hub.docker.com/r/openidentityplatform/opendj/)
 
-docker run -h ldap-01.domain.com -p 1389:1389 -p 1636:1636 -p 4444:4444 --name ldap-01 openidentityplatform/opendj
-
 ```bash
 docker run -h opendj-01.domain.com -p 1389:1389 -p 1636:1636 -p 4444:4444 \
 --name opendj-01 \
@@ -114,9 +112,8 @@ docker run -h opendj-01.domain.com -p 1389:1389 -p 1636:1636 -p 4444:4444 \
 --detach openidentityplatform/opendj
 ```
 
-docker run -it --rm --entrypoint "/opt/opendj/bin/import-ldif" -v ./data.ldif:/opt/opendj/import-data/data.ldif openidentityplatform/opendj -b dc=openam,dc=openidentityplatform,dc=org -D 'cn=Directory Manager' -h opendj -p 1389 -w passw0rd -l /opt/opendj/import-data/data.lidf
-
-docker run -it -v patrons.ldif:/opt/opendj/bootstrap/data/data.ldif openidentityplatform/opendj -b dc=openam,dc=openidentityplatform,dc=org -D 'cn=Directory Manager' -h opendj -p 1389 -w passw0rd -l /opt/opendj/bootstrap/data/data.lidf
+Error Command:
+`docker run -it --rm --entrypoint "/opt/opendj/bin/import-ldif" -v patrons.ldif:/opt/opendj/import-data/data.ldif openidentityplatform/opendj -b dc=openam,dc=openidentityplatform,dc=org -D 'cn=Directory Manager' -h opendj -p 1389 -w passw0rd -l /opt/opendj/import-data/data.lidf`
 
 #### opendJ 设置
 
@@ -169,7 +166,18 @@ SimpleLdapTemplate 仅公开 LdapTemplate 中可用操作的子集。但是，�
 ## Spring 应用程序上下文
 
 每个 Spring Framework 应用程序的核心是 ApplicationContext 的概念。 这个接口的实现负责创建和配置 Spring bean。 应用程序上下文还充当 IoC 容器并负责执行依赖注入。 Spring bean 只是一个标准 POJO，其中包含在 Spring 容器内运行所需的元数据。
-在标准 Spring 应用程序中，ApplicationContext 是通过 XML 文件或 Java 注释配置的。 applicationContext.xml 显示了一个带有一个 bean 声明的示例应用程序上下文文件。 bean myBean 的类型为 com.inflinx.book.ldap.SimplePojo。 当应用程序加载上下文时，Spring 创建一个 SimplePojo 实例并对其进行管理。
+在标准 Spring 应用程序中，ApplicationContext 是通过 XML 文件或 Java 注释配置的。 以下代码 显示了一个带有一个 bean 声明的示例应用程序上下文文件。 bean myBean 的类型为 com.inflinx.book.ldap.SimplePojo。 当应用程序加载上下文时，Spring 创建一个 SimplePojo 实例并对其进行管理。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/
+beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd">
+<bean id="myBean" class="com.inflinx.book.ldap.SimplePojo">
+        </bean>
+</beans>
+```
 
 ## Spring 驱动的搜索客户端
 
@@ -203,3 +211,7 @@ modifyAttributes 方法的这种变体将要修改的条目的完全限定唯一
 ### 删除操作
 
 与添加和修改类似，LdapTemplate 使用 unbind 方法可以轻松删除条目。
+
+## 待实现 ladps 链接
+
+sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target.

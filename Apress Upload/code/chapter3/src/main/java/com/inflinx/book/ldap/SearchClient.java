@@ -7,14 +7,13 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.stereotype.Component;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
 @Component
 public class SearchClient {
 
-	private static final Logger LOGGER = LogManager.getLogger();
-
+	/**
+	 * AttributesMapper is a raw type. 
+	 * The generic type AttributesMapper<T> should be parameterized by string type.
+	 */
 	@SuppressWarnings("unchecked")
 	public List<String> search() {
 		LdapTemplate ldapTemplate = getLdapTemplate();
@@ -25,9 +24,9 @@ public class SearchClient {
 	private LdapTemplate getLdapTemplate() {
 		// 配置和创建 LDAP 服务器上的初始上下文实例
 		LdapContextSource contextSource = new LdapContextSource();
-		contextSource.setUrl("ldap://localhost:11389");
-		contextSource.setUserDn("cn=Directory Manager");
-		contextSource.setPassword("opendj");
+		contextSource.setUrl("ldap://localhost:1389");
+		contextSource.setUserDn("cn=Directory Manager WK");
+		contextSource.setPassword("passwordwk");
 		try {
 			contextSource.afterPropertiesSet();
 		} catch (Exception e) {
@@ -42,9 +41,8 @@ public class SearchClient {
 	public static void main(String[] args) {
 		SearchClient client = new SearchClient();
 		List<String> names = client.search();
-
 		for (String name : names) {
-			LOGGER.trace(name);
+			System.out.println(name);
 		}
 	}
 }

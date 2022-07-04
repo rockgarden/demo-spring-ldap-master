@@ -21,8 +21,7 @@ public class SpringSearchClient {
 	private LdapTemplate ldapTemplate;
 	
 	@SuppressWarnings("unchecked")
-	public List<String> search() {
-		
+	public List<String> search() {		
 		return ldapTemplate.search("dc=inflinx,dc=com", "(objectclass=person)", 
 				new AttributesMapper() {
 					@Override
