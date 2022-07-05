@@ -8,6 +8,7 @@ import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.simple.SimpleLdapTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.inflinx.book.ldap.domain.Employee;
@@ -22,14 +23,14 @@ public class EmployeeDaoLdapImpl implements EmployeeDao {
 	
 	@Override
 	public List<Employee> findAll() {
-		return ldapTemplate.search("", "(objectClass=inetOrgPerson)", new EmployeeContextMapper());
+		return ldapTemplate.search("ou=employees,dc=inflinx,dc=com", "(objectClass=inetOrgPerson)", new EmployeeContextMapper());
 	}
 	
 	@Override
 	public Employee find(String id) { 
 		DistinguishedName dn = new DistinguishedName();
 		dn.add("uid", id);
-		return ldapTemplate.lookup(dn, new EmployeeContextMapper()); 
+		return (Employee) ldapTemplate.lookup(dn, new EmployeeContextMapper()); 
 	}
 	
 	@Override

@@ -39,7 +39,6 @@ public class EmployeeDaoLdapImplTest {
 	@Before
 	public void setup() throws Exception {
 		System.out.println("Inside the setup");
-		// LdapUnitUtils.loadData(new ClassPathResource("employees.ldif"), port);
 		LdapUnitUtils.loadData(contextSource, new ClassPathResource("employees.ldif"), port);
 	}
 	
@@ -47,14 +46,13 @@ public class EmployeeDaoLdapImplTest {
 	@After
 	public void teardown() throws Exception {
 		System.out.println("Inside the teardown");
-		// LdapUnitUtils.clearSubContexts(new DistinguishedName(ROOT_DN), port);
 		LdapUnitUtils.clearSubContexts(contextSource, new DistinguishedName(ROOT_DN), port);
 	}
 
 	@Test
 	public void testFindAll() {
 		List<Employee> employeeList = employeeDao.findAll();
-		Assert.assertTrue(employeeList.size() > 0);
+		Assert.assertTrue(employeeList.size(););
 	}
 
 	@Test
@@ -80,7 +78,6 @@ public class EmployeeDaoLdapImplTest {
 
 	@Test
 	public void testUpdate() {
-
 		Employee employee1 = employeeDao.find("employee1");
 		employee1.setFirstName("Employee New");
 		employeeDao.update(employee1);

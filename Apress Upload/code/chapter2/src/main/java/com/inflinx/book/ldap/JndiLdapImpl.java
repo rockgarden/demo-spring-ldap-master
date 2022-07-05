@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import javax.naming.Binding;
+import javax.naming.Context;
 import javax.naming.ContextNotEmptyException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -28,16 +29,15 @@ public class JndiLdapImpl {
 	private DirContext getContext() throws NamingException {
 		Properties environment = new Properties();
 		// 指定服务提供者类
-		environment.setProperty(DirContext.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		environment.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		// PROVIDER_URL 指定 LDAP 服务 URL, 协议 ldap 或 ldaps、LDAP 服务器主机名和端口
-		environment.setProperty(DirContext.PROVIDER_URL, "ldaps://192.168.97.156:636");
+		environment.setProperty(Context.PROVIDER_URL, "ldap://localhost:1389");
 		// SECURITY_AUTHENTICATION 属性设置为 simple，表示使用纯文本用户名和密码进行身份验证
-		environment.setProperty(DirContext.SECURITY_AUTHENTICATION, "simple");
-		environment.setProperty(DirContext.SECURITY_PRINCIPAL, "uid=admin,ou=system");
-		environment.setProperty(DirContext.SECURITY_PRINCIPAL, "cn=Directory Manager");
-		environment.setProperty(DirContext.SECURITY_CREDENTIALS, "opendj");
-		DirContext context = new InitialDirContext(environment);
-		return context;
+		environment.setProperty(Context.SECURITY_AUTHENTICATION, "simple");
+		environment.setProperty(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
+		environment.setProperty(Context.SECURITY_PRINCIPAL, "cn=Directory Manager WK");
+		environment.setProperty(Context.SECURITY_CREDENTIALS, "passwordwk");
+		return new InitialDirContext(environment);
 	}
 
 	// Closing Resources

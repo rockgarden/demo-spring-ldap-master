@@ -10,7 +10,7 @@
 
 	<bean id="contextSource" class="com.inflinx.book.ldap.test.EmbeddedContextSourceFactory">
 		<property name="rootDn" value="dc=inflinx,dc=com" />
-		<property name="port" value="ldapPort" />
+		<property name="port" value="12389" />
 		<property name="base" value="ou=employees,dc=inflinx,dc=com" />
 		<property name="serverType" value="OPENDJ" />
 	</bean>
@@ -20,7 +20,7 @@
 	</bean>
 
 	<!-- org.springframework.ldap.core.simple.SimpleLdapTemplate is deprecated-->
-	
+
 	<bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
 		<constructor-arg ref="contextSource" />
 	</bean>
