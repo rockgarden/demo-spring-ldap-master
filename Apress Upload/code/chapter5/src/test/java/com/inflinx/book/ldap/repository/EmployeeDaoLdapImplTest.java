@@ -52,7 +52,7 @@ public class EmployeeDaoLdapImplTest {
 	@Test
 	public void testFindAll() {
 		List<Employee> employeeList = employeeDao.findAll();
-		Assert.assertTrue(employeeList.size(););
+		Assert.assertTrue(employeeList.size() > 0);
 	}
 
 	@Test

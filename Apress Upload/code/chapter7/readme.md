@@ -136,6 +136,6 @@ SortControlDirContextProcessor 构造函数采用 LDAP 属性名称
 
 pageAllPatrons() 中，您通过获取 LDAP 服务器上的上下文来开始实现。 然后创建 PagedResultsControl 并将页面大小指定为其构造函数参数。 您将控件添加到上下文并执行搜索操作。 然后循环搜索结果并在控制台上显示信息。 作为下一步，您将检查响应控件以识别服务器发送的 PagedResultsResponseControl。 从该控件中，您可以提取 cookie 和该搜索的估计结果总数。 结果计数是可选信息，服务器可以简单地返回零，指示未知计数。 最后，使用页面大小和 cookie 作为其构造函数参数创建一个新的 PagedResultsControl。 重复此过程，直到服务器发送一个空 (null) cookie 指示没有更多结果要处理。
 
-Spring LDAP 抽象了清单 7-10 中的大部分代码，并使用 PagedResultsDirContextProcessor 轻松处理页面控件。 SpringPaging.pagedResults() 显示了 Spring LDAP 代码。
+Spring LDAP 抽象了 pageAllPatrons() 中的大部分代码，并使用 PagedResultsDirContextProcessor 轻松处理页面控件。 SpringPaging.pagedResults() 显示了 Spring LDAP 代码。
 
 在此实现中，您使用页面大小和 cookie 创建 PagedResultsDirContextProcessor。 请注意，您正在使用 org.springframework.ldap.control.PagedResultsCookie 类来抽象服务器发送的 cookie。 cookie 值最初以 null 开头。 然后执行搜索并遍历结果。 服务器发送的 cookie 是从 DirContextProcessor 中提取的，用于检查未来的搜索请求。 您还使用 LastNameMapper 类从结果上下文中提取姓氏。 SpringPaging.java 中的 private class LastNameMapper 给出了 LastNameMapper 类的实现。

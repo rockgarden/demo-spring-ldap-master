@@ -14,48 +14,43 @@ import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 
 public class PagingJndi {
-	
+
 	// We will be getting the LDAP context
 	private LdapContext getContext() {
 		Properties environment = new Properties();
 		environment.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		environment.setProperty(Context.PROVIDER_URL, "ldap://localhost:11389");
-		environment.setProperty(Context.SECURITY_PRINCIPAL, "cn=Directory Manager");
-		environment.setProperty(Context.SECURITY_CREDENTIALS, "opendj");
-		
+		environment.setProperty(Context.PROVIDER_URL, "ldap://localhost:1389");
+		environment.setProperty(Context.SECURITY_PRINCIPAL, "cn=Directory Manager WK");
+		environment.setProperty(Context.SECURITY_CREDENTIALS, "passwordwk");
 		try {
-			// The second argument is the list of controls that we need to send 
-			// as part of the connection request
+			// The second argument is the list of controls that we need to send as part of the connection request
 			return new InitialLdapContext(environment, null);
-		}
-		catch(NamingException e) {
+		} catch (NamingException e) {
 			return null;
 		}
 	}
-		
+
 	public void pageAllPatrons() {
-		
 		try {
-			
 			LdapContext context = getContext();
 			PagedResultsControl prc = new PagedResultsControl(20, Control.CRITICAL);
-			
-			context.setRequestControls(new Control[]{prc});
+
+			context.setRequestControls(new Control[] { prc });
 			byte[] cookie = null;
-			
+
 			SearchControls searchControls = new SearchControls();
 			searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			
+
 			do {
 				NamingEnumeration results = context.search("dc=inflinx,dc=com", "(objectClass=inetOrgPerson)", searchControls);
 
 				// Iterate over search results
 				while (results != null && results.hasMore()) {
 					// Display an entry
-					SearchResult entry = (SearchResult)results.next();
+					SearchResult entry = (SearchResult) results.next();
 					System.out.println(entry.getAttributes().get("sn") + " ( " + (entry.getName()) + " )");
 				}
-		     
+
 				// Examine the paged results control response
 				Control[] controls = context.getResponseControls();
 				if (controls != null) {
@@ -67,19 +62,19 @@ public class PagingJndi {
 						}
 					}
 				}
-	         
+
 				// Re-activate paged results
-				context.setRequestControls(new Control[]{ new PagedResultsControl(20, cookie, Control.CRITICAL) });
-	
-			} while(cookie != null);
-		     
+				context.setRequestControls(new Control[] {
+						new PagedResultsControl(20, cookie, Control.CRITICAL) });
+
+			} while (cookie != null);
+
 			context.close();
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		new PagingJndi().pageAllPatrons();
 	}

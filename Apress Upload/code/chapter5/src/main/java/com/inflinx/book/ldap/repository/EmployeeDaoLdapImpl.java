@@ -8,7 +8,6 @@ import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.simple.SimpleLdapTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.inflinx.book.ldap.domain.Employee;

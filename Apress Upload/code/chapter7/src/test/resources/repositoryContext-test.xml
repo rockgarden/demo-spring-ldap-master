@@ -7,13 +7,14 @@
 	<context:component-scan base-package="com.inflinx.book" />
 
 	<bean id="contextSource" class="org.springframework.ldap.core.support.LdapContextSource">
-		<property name="url" value="ldap://localhost:11389" />
-		<property name="userDn" value="cn=Directory Manager" />
-		<property name="password" value="opendj" />
-		<property name="base" value=""/>
+		<property name="url" value="ldap://localhost:1389" />
+		<property name="userDn" value="cn=Directory Manager WK" />
+		<property name="password" value="passwordwk" />
+		<!-- base 为空会引起 LDAP Controls 调用报错 -->
+		<property name="base" value="dc=inflinx,dc=com"/>
 	</bean>
 
-	<bean id="ldapTemplate" class="org.springframework.ldap.core.simple.SimpleLdapTemplate">
+	<bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
 		<constructor-arg ref="contextSource" />
 	</bean>
 
