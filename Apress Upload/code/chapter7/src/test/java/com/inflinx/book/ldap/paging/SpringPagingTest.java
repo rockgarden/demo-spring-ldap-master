@@ -12,7 +12,7 @@ public class SpringPagingTest {
 
 	@Autowired
 	private SpringPaging springPaging;
-	
+
 	@Test
 	public void testPagedResults() {
 		springPaging.pagedResults();

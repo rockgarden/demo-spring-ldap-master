@@ -14,8 +14,7 @@ public class SupportedControlApplication {
 	public void displayControls() {
 		
 		String ldapUrl = "ldap://localhost:11389";
-		try {
-			
+		try {			
 			Properties environment = new Properties();
 			environment.setProperty(DirContext.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 			environment.setProperty(DirContext.PROVIDER_URL, ldapUrl);

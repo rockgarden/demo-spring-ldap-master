@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
+import javax.naming.Context;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
@@ -18,10 +18,10 @@ public class PagingJndi {
 	// We will be getting the LDAP context
 	private LdapContext getContext() {
 		Properties environment = new Properties();
-		environment.setProperty(DirContext.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		environment.setProperty(DirContext.PROVIDER_URL, "ldap://localhost:11389");
-		environment.setProperty(DirContext.SECURITY_PRINCIPAL, "cn=Directory Manager");
-		environment.setProperty(DirContext.SECURITY_CREDENTIALS, "opendj");
+		environment.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		environment.setProperty(Context.PROVIDER_URL, "ldap://localhost:11389");
+		environment.setProperty(Context.SECURITY_PRINCIPAL, "cn=Directory Manager");
+		environment.setProperty(Context.SECURITY_CREDENTIALS, "opendj");
 		
 		try {
 			// The second argument is the list of controls that we need to send 

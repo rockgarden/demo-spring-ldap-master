@@ -55,7 +55,8 @@ Table 6-1. Search Filter Operators。
 | Or Filter                      | /|/     | (|(sn=Smith) (sn=Lee))     | Returns all entries with last name Smith or Lee.                                                                             |
 | Not Filter                     | !       | (!(sn=Smith))              | Returns all entries whose last name is not Smith.                                                                            |
 
-可选参数
+### 可选参数
+
 除了上述三个参数之外，还可以包含几个可选参数来控制搜索行为。例如，timelimit 参数表示允许完成搜索的时间。同样， sizelimit 参数为可以作为结果的一部分返回的条目数设置了上限。
 一个非常常用的可选参数涉及提供属性名称列表。执行搜索时，LDAP 服务器默认返回与在搜索中找到的条目关联的所有属性。有时这可能是不可取的。在这些情况下，您可以提供属性名称列表作为搜索的一部分，LDAP 服务器将仅返回具有这些属性的条目。以下是 LdapTemplate 中的搜索方法示例，该方法采用属性名称数组（ATTR_1、ATTR_2 和 ATTR_3）：
 `ldapTemplate.search("SEARCH_BASE", "uid=USER_DN", 1, new String[]{"ATTR_1", "ATTR_2", ATTR_3}, new SomeContextMapperImpl());`
@@ -117,14 +118,11 @@ SearchFilterDemoTest.java 显示了使用上述 EqualsFilter 作为参数调用 
 子字符串中的通配符 `*` 用于匹配零个或多个字符。 但是，了解 LDAP 搜索过滤器不支持正则表达式非常重要。
 
 Table 6-2. LDAP Substring Examples
-LDAP Substring
-(givenName=*son)
-(givenName=J*n)
-(givenName=*a*) (givenName=J*s*n)
-Description
-Matches all patrons whose first name ends with son.
-Matches all patrons whose first name starts with J and ends with n.
-Matches all patrons with first name containing the character a. Matches patrons whose first name starts with J, contains character s, and ends with n.
+| LDAP Substring                    | Description                                                                                                                                            |
+|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| (givenName=*son)                  | Matches all patrons whose first name ends with son.                                                                                                    |
+| (givenName=J*n)                   | Matches all patrons whose first name starts with J and ends with n.                                                                                    |
+| (givenName=*a*) (givenName=J*s*n) | Matches all patrons with first name containing the character a. Matches patrons whose first name starts with J, contains character s, and ends with n. |
 
 当您可以通过简单地使用 EqualsFilter 来完成相同的过滤器表达式时，您可能想知道 LikeFilter 的必要性，如下所示：
 `EqualsFilter filter = new EqualsFiler("uid", "Ja*");`
@@ -264,18 +262,13 @@ Spring LDAP 不提供任何开箱即用的类来创建近似过滤器。在 Appr
 
 有时您需要使用 `(` 或 `*` 等在 LDAP 中具有特殊含义的字符构建搜索过滤器。要成功执行这些过滤器，正确转义特殊字符很重要。转义使用格式 `\xx` 完成其中 `xx` 表示字符的十六进制表示。表 6-3 列出了所有特殊字符及其转义值。
 
-表 6-3 特殊字符和转义值
-Table 6-3. Special Characters and Escape Values
-CHAPTER 6 ■ SEARCHIng LDAP
-  Special Character
-(
-)
-*
-\ /
-Escape Value
-\28
-\29
-\2a
-\5c \2f
+表 6-3 特殊字符Special Characters和转义值Escape Values
 
-除上述字符外，如果在 DN 中使用了以下任何字符，还需要对其进行适当的转义：逗号 (,)、等号 (=)、加号 (+)、小于 (<)、大于 (>)、井号 (#) 和分号 (;)。
+| Special Character | Escape Value |
+|-------------------|--------------|
+| (                 | \28          |
+| )                 | \29          |
+| *                 | \2a          |
+| \ /               | \5c \2f      |
+
+除上述字符外，如果在 DN 中使用了以下任何字符，还需要对其进行适当的转义：逗号 (,)、等号 (=)、加号 (+)、小于 (<)、大于 (>)、井号 (#) 和分号 `(;)`。
