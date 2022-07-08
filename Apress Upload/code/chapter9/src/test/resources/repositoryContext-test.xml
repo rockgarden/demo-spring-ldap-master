@@ -12,7 +12,7 @@
 		<property name="url" value="ldap://localhost:1389" />
 		<property name="userDn" value="cn=Directory Manager WK" />
 		<property name="password" value="passwordwk" />
-		<property name="base" value=""/>
+		<property name="base" value="dc=inflinx,dc=com"/>
 	</bean>
 
 	<bean id="contextSource" class="org.springframework.ldap.transaction.compensating.manager.TransactionAwareContextSourceProxy">
@@ -23,10 +23,14 @@
 		<constructor-arg ref="contextSource" />
 	</bean>
 
+	<!-- Caused by: org.springframework.beans.factory.BeanCreationException: 
+		Error creating bean with name 'transactionManager' defined in class path resource [repositoryContext-test.xml]: 
+		Invocation of init method failed; nested exception is java.lang.IllegalArgumentException: 
+		RenamingStrategy must be specified -->
 	<bean id="transactionManager" class="org.springframework.ldap.transaction.compensating.manager.ContextSourceTransactionManager">
 		<property name="contextSource" ref="contextSource" />
 	</bean>
 
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
-</beans>		
+</beans>

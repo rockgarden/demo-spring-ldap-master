@@ -4,7 +4,7 @@ public class PhoneNumber {
 	private int areaCode;
 	private int exchange;
 	private int extension;
-	
+
 	public PhoneNumber(int areaCode, int exchange, int extension) {
 		this.areaCode = areaCode;
 		this.exchange = exchange;
@@ -12,9 +12,12 @@ public class PhoneNumber {
 	}
 
 	public boolean equals(Object obj) {
-		if(obj == null || obj.getClass() != this.getClass()) { return false; }
+		if (obj == null || obj.getClass() != this.getClass()) {
+			return false;
+		}
 		PhoneNumber p = (PhoneNumber) obj;
-		return (this.areaCode ==  p.areaCode) && (this.exchange == p.exchange) && (this.extension == p.extension);
+		return (this.areaCode == p.areaCode) && (this.exchange == p.exchange)
+				&& (this.extension == p.extension);
 	}
 
 	public String toString() {
@@ -27,7 +30,7 @@ public class PhoneNumber {
 		result = 37 * result + areaCode;
 		result = 37 * result + exchange;
 		result = 37 * result + extension;
-		
+
 		return result;
 	}
 }

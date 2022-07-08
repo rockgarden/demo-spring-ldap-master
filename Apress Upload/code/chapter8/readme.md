@@ -207,3 +207,56 @@ OdmManager 内部工作原理:
 5. ConverterManagerFactoryBean 使用 ConverterConfig 实例来简化 Converter 注册。 ConverterConfig 类采用 fromClasses、toClasses 和伴随关系的转换器。The ConverterConfig class takes the fromClasses, toClasses, and the converter that goes along with the relationship.
 
 ## ODM Metadata
+
+org.springframework.ldap.odm.annotations 包包含可用于将简单的 Java POJO 转换为 ODM 可管理实体的注释。 Patron.java   显示了您将转换为 ODM 实体的 Patron 类。
+
+您将通过使用 @Entry 注释类来开始转换。 此标记注释告诉 ODM 管理器该类是一个实体。 它还用于提供实体映射到的 LDAP 中的 objectClass 定义。 见带 @Entry 注释的 Patron 类。
+
+您需要添加的下一个注释是@Id。 此注释指定条目的 DN，并且只能放置在 javax.naming.Name 类的派生字段上。
+为了解决这个问题，您将在 Patron 类中创建一个名为 dn 的新字段。 见带 @Id 注释的 Patron 属性。
+
+Java Persistence API 中的 @Id 注释指定实体bean 的标识符属性。此外，它的位置决定了 JPA 提供者将用于映射的默认访问策略。如果 @Id 放置在字段上，则使用字段访问。如果将它放在 getter 方法上，将使用属性访问。但是，Spring LDAP ODM 只允许字段访问。
+@Entry 和 @Id 是使Patron 类成为 ODM 实体的仅有的两个必需注释。默认情况下，Patron 实体类中的所有字段都将自动变为可持久化的。默认策略是在持久化或读取时使用实体字段的名称作为 LDAP 属性名称。在 Patron 类中，这将
+因为字段名称和 LDAP 属性名称相同，所以适用于电话号码或邮件等属性。但这会导致诸如 firstName 和 fullName 之类的字段出现问题，因为它们的名称与 LDAP 属性名称不同。为了解决这个问题，ODM 提供了将实体字段映射到对象类字段的 @Attribute 注释。此注释允许您指定 LDAP 属性的名称、可选的语法 OID 和可选的类型声明。见显示了完全注释的 Patron 实体类。
+有时您不想保留实体类的某些字段。 通常，这些涉及计算的字段。 此类字段可以使用 @Transient 注释进行注释，指示 OdmManager 应忽略该字段。
+
+## ODM Service Class服务等级
+
+基于 Spring 的企业应用程序通常有一个服务层来保存应用程序的业务逻辑。 服务层中的类将持久性细节委托给 DAO 或存储库层。 在第 5 章中，您使用 LdapTemplate 实现了一个 DAO。 在本节中，您将创建一个使用 OdmManager 作为 DAO 替代品的新服务类。 PatronService.java 显示了您将要实现的服务类的接口。
+服务类实现如 PatronServiceImpl.java 所示。 在实现中，您注入了一个 OdmManager 实例。 创建和更新方法实现只是将调用委托给 OdmManager。 find 方法将传入的 id 参数转换为完全限定的 DN，并将实际检索委托给 OdmManager 的 read 方法。 最后，delete 方法使用 find 方法读取赞助人，并使用 OdmManager 的 delete 方法将其删除。
+
+验证 PatronService 实现的 JUnit 测试如 PatronServiceImplTest.java 所示。
+
+repositoryContext-test.xml 文件包含您目前看到的配置片段。
+
+## Configuration Simplifications
+
+示例 repositoryContext-test.xml 中的配置乍一看可能令人望而生畏。 因此，为了解决这个问题，让我们创建一个新的 ConverterManager 实现来简化配置过程。 DefaultConverterManagerImpl.java 代码显示了 DefaultConverterManagerImpl 类。 如您所见，它在其实现中使用了 ConverterManagerImpl 类。
+
+使用这个类可以大大减少所需的配置，如 repositoryContext-test2.xml 所示。
+
+### 创建自定义转换器
+
+考虑您的 Patron 类使用 customPhoneNumber 类来存储读者的电话号码的场景。 现在，当需要持久化一个 Patron 类时，您需要将 PhoneNumber 类转换为 String 类型。 同样，当您从 LDAP 中读取 Patron 类时，电话属性中的数据需要转换为 PhoneNumber 类。 默认的 ToStringConverter 和 FromStringConverter 对这种转换没有用处。 新建  PhoneNumber.java 并修改 Patron 类，添加以下代码：
+
+```java
+public class Patron {
+   ...
+   @Attribute(name = "telephoneNumber") 
+   private PhoneNumber phoneNumber;
+   ...
+   @Override
+   public String toString() {
+      return "Dn: " + dn + ", firstName: " + firstName + "," + " fullName: " + fullName + ", " + "Telephone Number: " + phoneNumber; }
+}
+```
+
+要将 PhoneNumber 转换为 String，您需要创建一个新的 FromPhoneNumberConverter 转换器。 清单 FromPhoneNumberConverter.java 显示了实现。 该实现只涉及调用 toString 方法来执行转换。
+
+接下来，您需要一个实现来将 LDAP 字符串属性转换为 Java PhoneNumber 类型。 为此，您需要创建 ToPhoneNumberConverter，如清单 ToPhoneNumberConverter 所示。
+
+最后，绑定配置中的所有内容，如清单 repositoryContext-test3.xml 所示。
+
+用于测试新添加的转换器的修改后的测试用例如清单 PatronServiceImplCustomTest.java 所示。
+
+Spring LDAP 的对象目录映射 (ODM) 弥合了对象和目录模型之间的差距。

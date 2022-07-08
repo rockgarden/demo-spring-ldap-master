@@ -20,12 +20,12 @@ import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:repositoryContext-test.xml")
-//@ContextConfiguration("classpath:repositoryContext-test2.xml")
+// @ContextConfiguration("classpath:repositoryContext-test2.xml")
 public class PatronServiceImplTest {
 
 	@Autowired
 	private PatronService patronService;
-	
+
 	private static final int PORT = 12389;
 	private static final String ROOT_DN = "dc=inflinx,dc=com";
 
@@ -34,7 +34,7 @@ public class PatronServiceImplTest {
 		System.out.println("Inside the setup");
 		LdapUnitUtils.loadData(new ClassPathResource("patrons.ldif"), PORT);
 	}
-	
+
 	@After
 	public void teardown() throws Exception {
 		System.out.println("Inside the teardown");
@@ -51,27 +51,26 @@ public class PatronServiceImplTest {
 		patron.setMail("balaji@inflinx.com");
 		patron.setEmployeeNumber(1234);
 		patron.setTelephoneNumber("8018640759");
-		
+
 		patronService.create(patron);
-		
+
 		// Lets read the patron
 		patron = patronService.find("patron10001");
 		assertNotNull(patron);
-		
+
 		patron.setTelephoneNumber("8018640850");
 		patronService.update(patron);
-		
+
 		patron = patronService.find("patron10001");
 		assertEquals(patron.getTelephoneNumber(), "8018640850");
-		
+
 		patronService.delete("patron10001");
 		try {
 			patron = patronService.find("patron10001");
 			assertNull(patron);
-		}
-		catch(NameNotFoundException e) {
-			
+		} catch (NameNotFoundException e) {
+
 		}
 	}
-	
+
 }

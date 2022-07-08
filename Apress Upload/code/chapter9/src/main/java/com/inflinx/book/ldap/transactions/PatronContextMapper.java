@@ -14,7 +14,7 @@ public class PatronContextMapper extends AbstractParameterizedContextMapper<Patr
 		patron.setUserId(context.getStringAttribute("uid"));
 		patron.setCn(context.getStringAttribute("cn"));
 		patron.setEmail(context.getStringAttribute("mail"));
-		
+
 		return patron;
 	}
 

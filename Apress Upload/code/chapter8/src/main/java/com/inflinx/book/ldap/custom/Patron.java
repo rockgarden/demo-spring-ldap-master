@@ -10,65 +10,97 @@ import org.springframework.ldap.odm.annotations.Id;
 
 @Entry(objectClasses = { "inetorgperson", "organizationalperson", "person", "top" })
 public class Patron {
-	
-    @Id
-    private Name dn;
-	
-    @Attribute(name = "sn")
-    private String lastName;
-    
-    @Attribute(name = "givenName")
-    private String firstName;
-    
-    @Attribute(name = "telephoneNumber")
-    private PhoneNumber phoneNumber;
-    
-    @Attribute(name = "cn")
-    private String fullName;
-    
-    private String mail;
-	
-    @Attribute(name = "objectClass")
-    private List<String> objectClasses;
-    
-    @Attribute(name = "employeeNumber", syntax = "2.16.840.1.113730.3.1.3")
-    private int employeeNumber;
 
-	public Name getDn() { return dn; }
+	@Id
+	private Name dn;
 
-	public void setDn(Name dn) { this.dn = dn; }
+	@Attribute(name = "sn")
+	private String lastName;
 
-	public String getLastName() { return lastName; }
+	@Attribute(name = "givenName")
+	private String firstName;
 
-	public void setLastName(String lastName) { this.lastName = lastName; }
+	@Attribute(name = "telephoneNumber")
+	private PhoneNumber phoneNumber;
 
-	public String getFirstName() { return firstName; }
+	@Attribute(name = "cn")
+	private String fullName;
 
-	public void setFirstName(String firstName) { this.firstName = firstName; }
+	private String mail;
 
-	public PhoneNumber getPhoneNumber() { return phoneNumber; }
+	@Attribute(name = "objectClass")
+	private List<String> objectClasses;
 
-	public void setPhoneNumber(PhoneNumber phoneNumber) { this.phoneNumber = phoneNumber; }
+	@Attribute(name = "employeeNumber", syntax = "2.16.840.1.113730.3.1.3")
+	private int employeeNumber;
 
-	public String getFullName() { return fullName; }
+	public Name getDn() {
+		return dn;
+	}
 
-	public void setFullName(String fullName) { this.fullName = fullName; }
+	public void setDn(Name dn) {
+		this.dn = dn;
+	}
 
-	public String getMail() { return mail; }
+	public String getLastName() {
+		return lastName;
+	}
 
-	public void setMail(String mail) { this.mail = mail; }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-	public List<String> getObjectClasses() { return objectClasses; }
+	public String getFirstName() {
+		return firstName;
+	}
 
-	public void setObjectClasses(List<String> objectClasses) { this.objectClasses = objectClasses; }
-	
-	public int getEmployeeNumber() { return employeeNumber; }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-	public void setEmployeeNumber(int employeeNumber) { this.employeeNumber = employeeNumber; }
+	public PhoneNumber getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(PhoneNumber phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
+	}
+
+	public List<String> getObjectClasses() {
+		return objectClasses;
+	}
+
+	public void setObjectClasses(List<String> objectClasses) {
+		this.objectClasses = objectClasses;
+	}
+
+	public int getEmployeeNumber() {
+		return employeeNumber;
+	}
+
+	public void setEmployeeNumber(int employeeNumber) {
+		this.employeeNumber = employeeNumber;
+	}
 
 	@Override
 	public String toString() {
-		return "Dn: " + dn + ", firstName: " + firstName + ", fullName: " + fullName 
-					+ ", Telephone Number: " + phoneNumber;
+		return "Dn: " + dn + ", firstName: " + firstName + ", fullName: " + fullName
+				+ ", Telephone Number: " + phoneNumber;
 	}
 }

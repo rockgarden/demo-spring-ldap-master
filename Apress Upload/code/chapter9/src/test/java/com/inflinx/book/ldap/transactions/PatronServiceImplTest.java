@@ -14,22 +14,24 @@ public class PatronServiceImplTest {
 
 	@Autowired
 	private PatronService patronService;
-	
-	// Uncomment @Test and Comment 	@Test(expected=RuntimeException.class) when PatronServiceImpl's delete is not simulating rollback
-//	@Test
-//	@Test(expected=RuntimeException.class)
+
+	// Uncomment @Test and Comment @Test(expected=RuntimeException.class) when
+	// PatronServiceImpl's delete is not simulating rollback
+	// @Test
+	// @Test(expected=RuntimeException.class)
 	public void testDeletePatron() {
 		patronService.delete("patron10001");
 	}
 
-	@Test(expected=RuntimeException.class)
+	// @Test
+	@Test(expected = RuntimeException.class)
 	public void testCreate() {
 		Patron patron = new Patron();
-		
+
 		patron.setUserId("patron10001");
 		patron.setLastName("Patron10001");
 		patron.setCn("Test Patron10001");
-		
+
 		patronService.create(patron);
-	}	
+	}
 }

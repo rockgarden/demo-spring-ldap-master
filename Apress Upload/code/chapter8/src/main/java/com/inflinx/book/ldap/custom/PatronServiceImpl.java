@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("patronServiceCustom")
 @Transactional
 public class PatronServiceImpl implements PatronService {
-	
-	private static final String PATRON_BASE  = "ou=patrons,dc=inflinx,dc=com";
-	
+
+	private static final String PATRON_BASE = "ou=patrons,dc=inflinx,dc=com";
+
 	@Autowired
 	@Qualifier("odmManager")
 	private OdmManager odmManager;
@@ -33,7 +33,7 @@ public class PatronServiceImpl implements PatronService {
 		dn.add("uid", id);
 		return odmManager.read(Patron.class, dn);
 	}
-	
+
 	@Override
 	public void delete(String id) {
 		odmManager.delete(find(id));
