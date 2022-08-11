@@ -13,6 +13,9 @@ hs_err_pid*
 
 # MacOS files
 Apress Upload/.DS_Store
+.DS_Store
+
+.gradle
 
 ################## Eclipse ######################
 target
@@ -71,3 +74,4 @@ build/
 
 #################### VS Code ####################
 .vscode/
+

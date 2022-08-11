@@ -85,7 +85,16 @@ public class StringUtilsTest {
 
 ApacheDS、OpenDJ 和 UnboundID 是可以嵌入到 Java 应用程序中的开源 LDAP 目录。嵌入式目录是应用程序 JVM 的一部分，可以轻松自动执行启动和关闭等任务。它们的启动时间很短，通常运行速度很快。嵌入式目录还消除了对每个开发人员或构建机器的专用独立 LDAP 服务器的需求。
 
-> 注意 这里讨论的概念是 LdapUnit 开源项目的基础。您将使用 LdapUnit 来测试代码。请访问 <http://ldapunit.org> 下载项目工件并浏览完整的源代码；但，网站无法访问！
+> 注意 这里讨论的概念是 LdapUnit 开源项目的基础。您将使用 LdapUnit 来测试代码。请访问 <http://ldapunit.org> 下载项目工件并浏览完整的源代码；但，网站无法访问！用 [com.btmatthews.ldapunit](https://ldapunit.btmatthews.com) 替代。
+
+```xml
+  <dependency>
+   <groupId>org.ldapunit</groupId>
+   <artifactId>ldapunit</artifactId>
+   <version>0.6.0</version>
+   <scope>test</scope>
+  </dependency>
+```
 
 嵌入 LDAP 服务器涉及以编程方式创建服务器并启动/停止它。然而，尽管它们很成熟，但以编程方式与 ApacheDS 或 OpenDJ 交互还是很麻烦。
 
